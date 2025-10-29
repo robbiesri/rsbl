@@ -1,0 +1,19 @@
+# Git Subtree Configuration
+# Define remote dependencies to be managed as git subtrees
+# ref can be a branch, tag or SHA hash.
+
+[[subtrees]]
+name = "doctest"
+remote = "https://github.com/doctest/doctest.git"
+prefix = "external/doctest"
+ref = "v2.4.12"
+enabled = true
+
+# Add more subtrees by duplicating the [[subtrees]] section:
+#
+# [[subtrees]]
+# name = "glfw"
+# remote = "https://github.com/glfw/glfw.git"
+# prefix = "external/glfw"
+# ref = "master"
+# enabled = true
