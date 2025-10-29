@@ -1,2 +1,5 @@
 # Local Python installation
 python_local/
+
+# Local CMake installation
+cmake_local/
