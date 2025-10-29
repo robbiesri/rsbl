@@ -301,6 +301,31 @@ if [ "$NEEDS_CMAKE" = true ]; then
 fi
 
 # ============================================================
+# Git Subtrees Setup
+# ============================================================
+
+echo -e "${CYAN}--- Git Subtrees Setup ---${NC}"
+echo ""
+
+# Check if we're in a git repository
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    SUBTREES_SCRIPT="$SCRIPT_DIR/setup_git_subtrees.py"
+
+    if [ -f "$SUBTREES_SCRIPT" ]; then
+        echo -e "${YELLOW}Running git subtrees setup...${NC}"
+        echo ""
+        "$LOCAL_PYTHON_EXE" "$SUBTREES_SCRIPT"
+        echo ""
+    else
+        echo -e "${YELLOW}[WARNING] Git subtrees script not found at: $SUBTREES_SCRIPT${NC}"
+        echo ""
+    fi
+else
+    echo -e "${YELLOW}[INFO] Not a git repository, skipping subtrees setup${NC}"
+    echo ""
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 
