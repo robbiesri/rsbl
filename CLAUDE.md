@@ -14,11 +14,17 @@ This project uses local installations of Python 3.13.9 and CMake 4.1.2 for devel
 
 Run the unified setup script to ensure both Python and CMake are available:
 
+**Windows (PowerShell):**
 ```powershell
 .\scripts\setup_build_env.ps1
 ```
 
-This script will:
+**Windows (Git Bash), Linux, or macOS:**
+```bash
+./scripts/setup_build_env.sh
+```
+
+These scripts will:
 - Check if Python 3.13.9 is already downloaded to `python_local/`
 - Download and extract Python 3.13.9 if not present
 - Check if CMake 4.1.2 is already downloaded to `cmake_local/`
