@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Copyright Robert Srinivasiah 2025
-# Licensed under the MIT License
+# Copyright 2025 Robert Srinivasiah 
+# Licensed under the MIT License, see the LICENSE file for more info
 """
 Git subtree setup script for rsbl.
 Manages remote dependencies as git subtrees.

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Copyright Robert Srinivasiah 2025
-# Licensed under the MIT License
+# Copyright 2025 Robert Srinivasiah 
+# Licensed under the MIT License, see the LICENSE file for more info
 # Bash script to ensure Python 3.13.9 and CMake 4.1.2 are available locally
 
 set -e
