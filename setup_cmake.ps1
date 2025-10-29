@@ -1,3 +1,5 @@
+# Copyright Robert Srinivasiah 2025
+# Licensed under the MIT License
 # PowerShell wrapper to run the CMake setup Python script
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path

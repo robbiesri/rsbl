@@ -1,3 +1,5 @@
+# Copyright Robert Srinivasiah 2025
+# Licensed under the MIT License
 # PowerShell script to ensure Python 3.13.9 is available locally
 
 $TargetVersion = "3.13.9"

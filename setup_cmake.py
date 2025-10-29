@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright Robert Srinivasiah 2025
+# Licensed under the MIT License
 """
 CMake setup script for rsbl.
 Downloads CMake 4.1.2 to local cmake_local directory.
