@@ -1,0 +1,9 @@
+# https://clang.llvm.org/extra/clang-tidy/checks/readability-identifier-naming.html#cmdoption-arg-classprefix
+
+CheckOptions:
+  - key:    readability-identifier-naming.PublicMemberCase
+    value:  'camelBack'
+  - key:    readability-identifier-naming.PrivateMemberCase
+    value:  'camelBack'
+  - key:    readability-identifier-naming.PrivateMemberPrefix
+    value:  'm_'

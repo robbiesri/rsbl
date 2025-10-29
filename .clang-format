@@ -1,0 +1,42 @@
+BasedOnStyle: Microsoft
+
+# IndentAccessModifiers doesn't seem to work with VS Code, so we use this
+# AccessModifierOffset: -4
+
+AlignEscapedNewlines: DontAlign
+
+AllowShortBlocksOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
+
+AlwaysBreakTemplateDeclarations: Yes
+
+BinPackArguments: false
+BinPackParameters: false
+
+BreakConstructorInitializers: BeforeComma
+
+ColumnLimit: 100
+
+Cpp11BracedListStyle: true
+
+DerivePointerAlignment: false
+
+FixNamespaceComments: true
+
+IndentAccessModifiers: false
+
+IndentPPDirectives: BeforeHash
+
+IndentWidth: 4
+
+Language: Cpp
+
+NamespaceIndentation: All
+
+PointerAlignment: Left
+
+ReflowComments: True
+
+UseTab: Never
