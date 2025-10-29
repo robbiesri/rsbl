@@ -9,9 +9,18 @@ Manages remote dependencies as git subtrees.
 import os
 import sys
 import subprocess
-import json
 from pathlib import Path
 from typing import List, Dict, Optional
+
+try:
+    import tomllib
+except ImportError:
+    try:
+        import tomli as tomllib
+    except ImportError:
+        print("[ERROR] TOML support not available.")
+        print("Please install tomli: pip install tomli")
+        sys.exit(1)
 
 
 class GitSubtreeManager:
@@ -19,7 +28,7 @@ class GitSubtreeManager:
 
     def __init__(self, repo_root: Path):
         self.repo_root = repo_root
-        self.config_file = repo_root / "subtrees.json"
+        self.config_file = repo_root / "subtrees.toml"
 
     def run_command(self, cmd: List[str], cwd: Optional[Path] = None) -> tuple[int, str, str]:
         """Run a command and return exit code, stdout, and stderr."""
@@ -41,7 +50,7 @@ class GitSubtreeManager:
         return returncode == 0
 
     def load_config(self) -> Dict:
-        """Load subtree configuration from JSON file."""
+        """Load subtree configuration from TOML file."""
         if not self.config_file.exists():
             print(f"[WARNING] Configuration file not found: {self.config_file}")
             print("Creating example configuration file...")
@@ -49,38 +58,47 @@ class GitSubtreeManager:
             return self.load_config()
 
         try:
-            with open(self.config_file, 'r') as f:
-                return json.load(f)
-        except json.JSONDecodeError as e:
-            print(f"[ERROR] Invalid JSON in configuration file: {e}")
+            with open(self.config_file, 'rb') as f:
+                return tomllib.load(f)
+        except Exception as e:
+            print(f"[ERROR] Invalid TOML in configuration file: {e}")
             sys.exit(1)
 
     def create_example_config(self):
-        """Create an example subtrees.json configuration file."""
-        example_config = {
-            "subtrees": [
-                {
-                    "name": "example-lib",
-                    "remote": "https://github.com/example/example-lib.git",
-                    "prefix": "external/example-lib",
-                    "branch": "main",
-                    "enabled": False
-                }
-            ]
-        }
+        """Create an example subtrees.toml configuration file."""
+        example_config = """# Git Subtree Configuration
+# Define remote dependencies to be managed as git subtrees
+# ref can be a branch, tag or SHA hash.
+
+[[subtrees]]
+name = "example-lib"
+remote = "https://github.com/example/example-lib.git"
+prefix = "external/example-lib"
+ref = "main"
+enabled = false
+
+# Add more subtrees by duplicating the [[subtrees]] section:
+#
+# [[subtrees]]
+# name = "glfw"
+# remote = "https://github.com/glfw/glfw.git"
+# prefix = "external/glfw"
+# ref = "master"
+# enabled = true
+"""
 
         with open(self.config_file, 'w') as f:
-            json.dump(example_config, f, indent=2)
+            f.write(example_config)
 
         print(f"[OK] Created example configuration at: {self.config_file}")
         print("     Edit this file to add your dependencies.")
 
-    def add_subtree(self, name: str, remote: str, prefix: str, branch: str = "main"):
+    def add_subtree(self, name: str, remote: str, prefix: str, ref: str = "main"):
         """Add a git subtree for a remote dependency."""
         print(f"\n--- Adding subtree: {name} ---")
         print(f"  Remote: {remote}")
         print(f"  Prefix: {prefix}")
-        print(f"  Branch: {branch}")
+        print(f"  Ref: {ref}")
 
         # Check if prefix already exists
         prefix_path = self.repo_root / prefix
@@ -102,7 +120,7 @@ class GitSubtreeManager:
         # Fetch from remote
         print(f"Fetching from remote '{name}'...")
         returncode, stdout, stderr = self.run_command([
-            "git", "fetch", name, branch
+            "git", "fetch", name, ref
         ])
 
         if returncode != 0:
@@ -114,7 +132,7 @@ class GitSubtreeManager:
         returncode, stdout, stderr = self.run_command([
             "git", "subtree", "add",
             "--prefix", prefix,
-            name, branch,
+            name, ref,
             "--squash"
         ])
 
@@ -125,11 +143,11 @@ class GitSubtreeManager:
         print(f"[OK] Successfully added subtree '{name}'")
         return True
 
-    def update_subtree(self, name: str, prefix: str, branch: str = "main"):
+    def update_subtree(self, name: str, prefix: str, ref: str = "main"):
         """Update an existing git subtree."""
         print(f"\n--- Updating subtree: {name} ---")
         print(f"  Prefix: {prefix}")
-        print(f"  Branch: {branch}")
+        print(f"  Ref: {ref}")
 
         # Check if prefix exists
         prefix_path = self.repo_root / prefix
@@ -141,7 +159,7 @@ class GitSubtreeManager:
         # Fetch from remote
         print(f"Fetching from remote '{name}'...")
         returncode, stdout, stderr = self.run_command([
-            "git", "fetch", name, branch
+            "git", "fetch", name, ref
         ])
 
         if returncode != 0:
@@ -153,7 +171,7 @@ class GitSubtreeManager:
         returncode, stdout, stderr = self.run_command([
             "git", "subtree", "pull",
             "--prefix", prefix,
-            name, branch,
+            name, ref,
             "--squash"
         ])
 
@@ -186,17 +204,17 @@ class GitSubtreeManager:
             name = subtree.get("name")
             remote = subtree.get("remote")
             prefix = subtree.get("prefix")
-            branch = subtree.get("branch", "main")
+            ref = subtree.get("ref", "main")
 
             if not all([name, remote, prefix]):
                 print(f"[WARNING] Skipping invalid subtree entry: {subtree}")
                 continue
 
             if update:
-                if self.update_subtree(name, prefix, branch):
+                if self.update_subtree(name, prefix, ref):
                     success_count += 1
             else:
-                if self.add_subtree(name, remote, prefix, branch):
+                if self.add_subtree(name, remote, prefix, ref):
                     success_count += 1
 
         print(f"\n{'=' * 60}")
