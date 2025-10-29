@@ -6,31 +6,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **rsbl** is a real-time rendering framework. This is a new project with minimal code currently in place.
 
-## Python Environment Setup
+## Build Environment Setup
 
-This project uses Python 3.13.9 as its local development environment. Python is managed locally in the `python_local/` directory.
+This project uses local installations of Python 3.13.9 and CMake 4.1.2 for development. Both are managed locally in the `python_local/` and `cmake_local/` directories.
 
 ### Initial Setup
 
-Run the setup script to ensure Python is available:
+Run the unified setup script to ensure both Python and CMake are available:
 
 ```powershell
-.\setup_python.ps1
+.\setup_build_env.ps1
 ```
 
 This script will:
 - Check if Python 3.13.9 is already downloaded to `python_local/`
 - Download and extract Python 3.13.9 if not present
-- Verify the installation
+- Check if CMake 4.1.2 is already downloaded to `cmake_local/`
+- Download and extract CMake 4.1.2 if not present
+- Verify both installations
 
-### Using Local Python
+### Using Local Tools
 
-After setup, use the local Python installation:
+After setup, use the local installations:
 
+**Python:**
 ```powershell
 .\python_local\python.exe your_script.py
 ```
 
+**CMake:**
+```powershell
+.\cmake_local\cmake-4.1.2-windows-x86_64\bin\cmake.exe [args]
+```
+
 ## Repository Status
 
-This repository is in its initial stages. The Python environment setup is complete, ready for rendering framework development.
+This repository is in its initial stages. The build environment setup is complete, ready for rendering framework development.
