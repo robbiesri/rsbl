@@ -40,14 +40,14 @@ case "$OS" in
     Linux)
         if [ "$ARCH" = "x86_64" ]; then
             PYTHON_PLATFORM="linux-x86_64"
-            LOCAL_PYTHON_EXE="$LOCAL_PYTHON_DIR/bin/python3"
         elif [ "$ARCH" = "aarch64" ]; then
             PYTHON_PLATFORM="linux-aarch64"
-            LOCAL_PYTHON_EXE="$LOCAL_PYTHON_DIR/bin/python3"
         else
             echo -e "${RED}[ERROR] Unsupported architecture: $ARCH${NC}"
+            echo -e "${YELLOW}Only x86_64 and aarch64 are supported${NC}"
             exit 1
         fi
+        LOCAL_PYTHON_EXE="$LOCAL_PYTHON_DIR/bin/python3"
         PYTHON_ARCHIVE_EXT="tar.gz"
         ;;
     Darwin)
@@ -57,6 +57,7 @@ case "$OS" in
             PYTHON_PLATFORM="macos-arm64"
         else
             echo -e "${RED}[ERROR] Unsupported architecture: $ARCH${NC}"
+            echo -e "${YELLOW}Only x86_64 and arm64 are supported${NC}"
             exit 1
         fi
         LOCAL_PYTHON_EXE="$LOCAL_PYTHON_DIR/bin/python3"
@@ -67,7 +68,9 @@ case "$OS" in
         if [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then
             PYTHON_ARCH="amd64"
         else
-            PYTHON_ARCH="win32"
+            echo -e "${RED}[ERROR] Unsupported architecture: $ARCH${NC}"
+            echo -e "${YELLOW}Only 64-bit (x86_64/amd64) is supported${NC}"
+            exit 1
         fi
         LOCAL_PYTHON_EXE="$LOCAL_PYTHON_DIR/python.exe"
         PYTHON_ARCHIVE_EXT="zip"
@@ -190,6 +193,7 @@ case "$OS" in
             CMAKE_PLATFORM="linux-aarch64"
         else
             echo -e "${RED}[ERROR] Unsupported architecture: $ARCH${NC}"
+            echo -e "${YELLOW}Only x86_64 and aarch64 are supported${NC}"
             exit 1
         fi
         CMAKE_ARCHIVE_EXT="tar.gz"
@@ -201,13 +205,14 @@ case "$OS" in
         LOCAL_CMAKE_EXE="$LOCAL_CMAKE_DIR/cmake-$CMAKE_TARGET_VERSION-$CMAKE_PLATFORM/CMake.app/Contents/bin/cmake"
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        # Windows (Git Bash)
+        # Windows (Git Bash) - 64-bit only
         if [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then
-            CMAKE_ARCH="x86_64"
+            CMAKE_PLATFORM="windows-x86_64"
         else
-            CMAKE_ARCH="i386"
+            echo -e "${RED}[ERROR] Unsupported architecture: $ARCH${NC}"
+            echo -e "${YELLOW}Only 64-bit (x86_64/amd64) is supported${NC}"
+            exit 1
         fi
-        CMAKE_PLATFORM="windows-$CMAKE_ARCH"
         CMAKE_ARCHIVE_EXT="zip"
         LOCAL_CMAKE_EXE="$LOCAL_CMAKE_DIR/cmake-$CMAKE_TARGET_VERSION-$CMAKE_PLATFORM/bin/cmake.exe"
         ;;
