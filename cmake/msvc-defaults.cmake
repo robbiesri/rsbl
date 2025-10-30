@@ -11,7 +11,7 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
 
 # warnings as errors
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wx")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
 
 # generate separate PDBs
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
