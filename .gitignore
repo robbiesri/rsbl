@@ -3,3 +3,9 @@ python_local/
 
 # Local CMake installation
 cmake_local/
+
+# CLion default CMake build folder
+cmake-build*/
+
+# Ignore JetBrains generated project files
+.idea/
