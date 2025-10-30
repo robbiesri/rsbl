@@ -28,5 +28,5 @@ endif()
 add_subdirectory(external/doctest)
 add_subdirectory(external/quill)
 
-# add_subdirectory(libraries)
-# add_subdirectory(apps)
+add_subdirectory(libraries)
+add_subdirectory(apps)
