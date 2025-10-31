@@ -42,4 +42,5 @@ add_subdirectory(external/quill)
 enable_testing()
 
 add_subdirectory(libraries)
+
 add_subdirectory(apps)
