@@ -5,7 +5,9 @@ cmake_minimum_required(VERSION 3.28)
 
 project(rsbl)
 
-# TODO: check for 32-bit?
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    message(FATAL_ERROR "32-bit builds not supported")
+endif()
 
 # Ignore MinSizeRel
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE)
