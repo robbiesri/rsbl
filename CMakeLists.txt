@@ -10,6 +10,10 @@ project(rsbl)
 # Ignore MinSizeRel
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE)
 
+#if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+#    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+#endif()
+
 list(APPEND CMAKE_MODULE_PATH
         ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -26,6 +30,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if (MSVC)
     include(msvc-defaults)
 endif()
+
+# Haven't thought about this much before, but Claude suggested it
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(external/doctest)
 add_subdirectory(external/quill)
