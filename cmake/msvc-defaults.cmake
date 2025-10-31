@@ -8,19 +8,19 @@
 
 # Enable all warnings
 # TODO: maybe roll back to /W3 in the future?
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
+add_compile_options(/Wall)
 
 # warnings as errors
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+add_compile_options(/WX)
 
 # generate separate PDBs
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
+add_compile_options(/Zi)
 
 # Enable multiprocess builds, and disable incremental (not compatible)
 # Also forces synchronous PDB writes, implicit to /MP
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Gm-")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS")
+add_compile_options(/MP)
+add_compile_options(/Gm-)
+add_compile_options(/FS)
 
 # don't collide with std::min/max
 add_compile_definitions(NOMINMAX)
