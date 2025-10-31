@@ -24,10 +24,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# TODO: Do I care about enabling/disabling exception handling?
-# TODO: warnings as errors?
-# TODO: compiler specific bits? Disable specific errors? Move vendor specific stuff to modules?
-# * gcc/clang - check out USD per-platform settings: https://github.com/PixarAnimationStudios/OpenUSD/tree/dev/cmake/
+
 
 if (MSVC)
     include(msvc-defaults)
@@ -40,6 +37,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(external/doctest)
 add_subdirectory(external/quill)
+
+# TODO : control
+enable_testing()
 
 add_subdirectory(libraries)
 add_subdirectory(apps)

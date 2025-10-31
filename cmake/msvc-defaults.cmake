@@ -5,6 +5,7 @@
 #   * Standards compliant?
 #   * Check for MSVC version?
 #   * Do I want VC 2022?
+#   * disable exception handling?
 
 # Enable all warnings
 # TODO: maybe roll back to /W3 in the future?
