@@ -30,3 +30,8 @@ namespace rsbl
     using RemoveReference = typename Internal::RemoveReference<T>::type;
 
 } // namespace rsbl
+
+// Borrowed from and justified by  https://www.foonathan.net/2020/09/move-forward/
+// tl;dr - functions bad
+#define rsblMove(...) static_cast<rsbl::RemoveReference<decltype(__VA_ARGS__)>&&>(__VA_ARGS__)
+#define rsblForward(...) static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
