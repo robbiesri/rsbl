@@ -3,6 +3,7 @@
 
 list(APPEND PUBLIC_HEADER_FILES
 #        ${INCLUDE_DIR}/rsbl-assert.h
+        include/rsbl-core.h
         include/rsbl-int-types.h
 )
 
