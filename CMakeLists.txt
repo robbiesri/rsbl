@@ -6,7 +6,9 @@ cmake_minimum_required(VERSION 3.28)
 project(rsbl)
 
 # TODO: check for 32-bit?
-# TODO: do I care about CMAKE_CONFIGURATION_TYPES? Modern tooling makes it simpler to manage the configs in the IDE
+
+# Ignore MinSizeRel
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE)
 
 list(APPEND CMAKE_MODULE_PATH
         ${PROJECT_SOURCE_DIR}/cmake)
