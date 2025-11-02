@@ -23,4 +23,15 @@ target_include_directories(rsbl-core
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# TODO: tests (starting with Result)
+# Tests
+add_executable(rsbl-result-test
+        rsbl-result.test.cpp
+)
+
+target_link_libraries(rsbl-result-test
+        PRIVATE
+        rsbl-core
+        doctest::doctest
+)
+
+add_test(NAME rsbl-result-test COMMAND rsbl-result-test)

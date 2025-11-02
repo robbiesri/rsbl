@@ -3,8 +3,13 @@
 
 #pragma once
 
-#include "include/rsbl-result.h"
 #include "rsbl-int-types.h"
+#include "rsbl-result.h"
+
+#if defined(_MSC_VER)
+    // I don't care about the padding in Result. C4324 might also appear!
+    #pragma warning(disable : 4820)
+#endif // _MSC_VER
 
 namespace rsbl
 {
@@ -21,23 +26,24 @@ namespace Internal
     void SetFailureText(const char* text);
     const char* GetFailureText();
 
-    // Clients can use any ReturnType without worrying about constructor collisions because of this
-    // internal opaque type. 'Empty' results will use this.
+    // Clients can use any ReturnType without worrying about constructor collisions because of
+    // this internal opaque type. 'Empty' results will use this.
     struct DefaultReturnType
     {
         uint8 x;
     };
 } // namespace Internal
 
-// Custom specialization of std::optional specifically for using as an error-handling return type
+// Custom specialization of std::optional specifically for using as an error-handling return
+// type
 
 // TODO: default return type?
 template <typename ReturnType = Internal::DefaultReturnType>
 class [[nodiscard]] Result
 {
   private:
-    // Instead of keeping an instance of ReturnType, we can use this buffer to control construction
-    // time with placement new (borrowed from std::optional)
+    // Instead of keeping an instance of ReturnType, we can use this buffer to control
+    // construction time with placement new (borrowed from std::optional)
     alignas(ReturnType) uint8 m_valueBuffer[sizeof(ReturnType)];
 
     // Default to success, for ReturnType construction simplification
@@ -65,7 +71,8 @@ class [[nodiscard]] Result
         }
     }
 
-    // TODO: compile-time detection constructors (if certain pass/fail types are passed in as args)
+    // TODO: compile-time detection constructors (if certain pass/fail types are passed in as
+    // args)
 
     // Moves
     Result(Result&& other)
