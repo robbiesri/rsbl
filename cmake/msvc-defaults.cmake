@@ -26,4 +26,5 @@ add_compile_options(/FS)
 # don't collide with std::min/max
 add_compile_definitions(NOMINMAX)
 
+# TODO: This might be a platform thing more than a MSVC thing, because it could be tied to clang-cl as well
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
