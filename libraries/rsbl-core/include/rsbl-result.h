@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include "rsbl-core.h"
 #include "rsbl-int-types.h"
-#include "rsbl-result.h"
+
+// I can't use placement new without this, WHOOPS
+#include <new>
 
 #if defined(_MSC_VER)
     // I don't care about the padding in Result. C4324 might also appear!
