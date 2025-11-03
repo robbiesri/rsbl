@@ -1,17 +1,19 @@
 #!/bin/bash
-# Copyright 2025 Robert Srinivasiah 
+# Copyright 2025 Robert Srinivasiah
 # Licensed under the MIT License, see the LICENSE file for more info
-# Bash script to ensure Python 3.13.9 and CMake 4.1.2 are available locally
+# Bash script to ensure Python 3.13.9, CMake 4.1.2, and Ninja 1.13.1 are available locally
 
 set -e
 
 PYTHON_TARGET_VERSION="3.13.9"
 CMAKE_TARGET_VERSION="4.1.2"
+NINJA_TARGET_VERSION="1.13.1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_ENV_DIR="$REPO_ROOT/build_env"
 LOCAL_PYTHON_DIR="$BUILD_ENV_DIR/python"
 LOCAL_CMAKE_DIR="$BUILD_ENV_DIR/cmake"
+LOCAL_NINJA_DIR="$BUILD_ENV_DIR/ninja"
 
 # Color codes
 CYAN='\033[0;36m'
@@ -307,6 +309,115 @@ if [ "$NEEDS_CMAKE" = true ]; then
 fi
 
 # ============================================================
+# Ninja Setup
+# ============================================================
+
+echo -e "${CYAN}--- Ninja Setup ---${NC}"
+echo ""
+
+case "$OS" in
+    Linux)
+        NINJA_PLATFORM="linux"
+        NINJA_ARCHIVE_EXT="zip"
+        LOCAL_NINJA_EXE="$LOCAL_NINJA_DIR/ninja"
+        ;;
+    Darwin)
+        NINJA_PLATFORM="mac"
+        NINJA_ARCHIVE_EXT="zip"
+        LOCAL_NINJA_EXE="$LOCAL_NINJA_DIR/ninja"
+        ;;
+    MINGW*|MSYS*|CYGWIN*)
+        # Windows (Git Bash)
+        NINJA_PLATFORM="win"
+        NINJA_ARCHIVE_EXT="zip"
+        LOCAL_NINJA_EXE="$LOCAL_NINJA_DIR/ninja.exe"
+        ;;
+esac
+
+NEEDS_NINJA=false
+
+# Check if local Ninja already exists
+if [ -f "$LOCAL_NINJA_EXE" ]; then
+    echo -e "${GREEN}[OK] Local Ninja installation found${NC}"
+    echo -e "${GRAY}  Location: $LOCAL_NINJA_EXE${NC}"
+
+    # Verify version
+    if VERSION_OUTPUT=$("$LOCAL_NINJA_EXE" --version 2>&1); then
+        echo -e "${GRAY}  Version: $VERSION_OUTPUT${NC}"
+        echo ""
+    else
+        echo -e "${YELLOW}[WARNING] Existing installation appears corrupted, re-downloading...${NC}"
+        rm -rf "$LOCAL_NINJA_DIR"
+        NEEDS_NINJA=true
+    fi
+else
+    NEEDS_NINJA=true
+fi
+
+if [ "$NEEDS_NINJA" = true ]; then
+    echo -e "${YELLOW}Downloading Ninja $NINJA_TARGET_VERSION to local directory...${NC}"
+    echo ""
+
+    # Create local directory
+    mkdir -p "$LOCAL_NINJA_DIR"
+
+    # Build download URL
+    NINJA_DOWNLOAD_URL="https://github.com/ninja-build/ninja/releases/download/v$NINJA_TARGET_VERSION/ninja-$NINJA_PLATFORM.zip"
+    NINJA_ARCHIVE="$LOCAL_NINJA_DIR/ninja-$NINJA_TARGET_VERSION.zip"
+
+    echo -e "${GRAY}  Downloading from: $NINJA_DOWNLOAD_URL${NC}"
+    echo ""
+
+    # Download
+    if command -v curl &> /dev/null; then
+        curl -L -o "$NINJA_ARCHIVE" "$NINJA_DOWNLOAD_URL"
+    elif command -v wget &> /dev/null; then
+        wget -O "$NINJA_ARCHIVE" "$NINJA_DOWNLOAD_URL"
+    else
+        echo -e "${RED}[ERROR] Neither curl nor wget found. Please install one of them.${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}[OK] Download complete${NC}"
+
+    # Extract
+    echo -e "${YELLOW}Extracting to $LOCAL_NINJA_DIR...${NC}"
+    if command -v unzip &> /dev/null; then
+        unzip -q "$NINJA_ARCHIVE" -d "$LOCAL_NINJA_DIR"
+    else
+        echo -e "${RED}[ERROR] unzip command not found.${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}[OK] Extraction complete${NC}"
+
+    # Clean up archive
+    rm "$NINJA_ARCHIVE"
+
+    # Make executable on Unix-like systems
+    if [[ "$OS" != MINGW* && "$OS" != MSYS* && "$OS" != CYGWIN* ]]; then
+        chmod +x "$LOCAL_NINJA_EXE"
+    fi
+
+    # Verify installation
+    if [ -f "$LOCAL_NINJA_EXE" ]; then
+        echo ""
+        echo -e "${GREEN}[OK] Ninja installed at: $LOCAL_NINJA_EXE${NC}"
+
+        # Test the installation
+        echo ""
+        echo -e "${YELLOW}Testing installation...${NC}"
+        "$LOCAL_NINJA_EXE" --version
+        echo ""
+    else
+        echo ""
+        echo -e "${RED}[ERROR] Ninja executable not found at expected location${NC}"
+        echo -e "${GRAY}  Expected: $LOCAL_NINJA_EXE${NC}"
+        exit 1
+    fi
+fi
+
+# ============================================================
 # Git Subtrees Setup
 # ============================================================
 
@@ -341,6 +452,7 @@ echo -e "${CYAN}============================================================${NC
 echo ""
 echo -e "${GRAY}Python: $LOCAL_PYTHON_EXE${NC}"
 echo -e "${GRAY}CMake:  $LOCAL_CMAKE_EXE${NC}"
+echo -e "${GRAY}Ninja:  $LOCAL_NINJA_EXE${NC}"
 echo ""
 
 exit 0

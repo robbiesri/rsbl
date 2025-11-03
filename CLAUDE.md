@@ -8,11 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Environment Setup
 
-This project uses local installations of Python 3.13.9 and CMake 4.1.2 for development. Both are managed locally in the `build_env/` directory.
+This project uses local installations of Python 3.13.9, CMake 4.1.2, and Ninja 1.13.1 for development. All tools are managed locally in the `build_env/` directory.
 
 ### Initial Setup
 
-Run the unified setup script to ensure both Python and CMake are available:
+Run the unified setup script to ensure all build tools are available:
 
 ```bash
 ./scripts/setup_build_env.sh
@@ -25,7 +25,9 @@ This script will:
 - Download and extract Python 3.13.9 if not present
 - Check if CMake 4.1.2 is already downloaded to `build_env/cmake/`
 - Download and extract CMake 4.1.2 if not present
-- Verify both installations
+- Check if Ninja 1.13.1 is already downloaded to `build_env/ninja/`
+- Download and extract Ninja 1.13.1 if not present
+- Verify all installations
 
 ### Using Local Tools
 
@@ -39,6 +41,11 @@ After setup, use the local installations:
 **CMake:**
 ```powershell
 .\build_env\cmake\cmake-4.1.2-windows-x86_64\bin\cmake.exe [args]
+```
+
+**Ninja:**
+```powershell
+.\build_env\ninja\ninja.exe [args]
 ```
 
 ## Repository Status
