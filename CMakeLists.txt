@@ -19,8 +19,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FOR
 list(APPEND CMAKE_MODULE_PATH
         ${PROJECT_SOURCE_DIR}/cmake)
 
-# TODO: enable C++23 support?
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -52,9 +51,9 @@ add_subdirectory(external/fastgltf)
 if (TARGET fastgltf)
     if (MSVC)
         target_compile_options(fastgltf PRIVATE /W0)
-    else()
+    else ()
         target_compile_options(fastgltf PRIVATE -w)
-    endif()
-endif()
+    endif ()
+endif ()
 
 add_subdirectory(apps)
