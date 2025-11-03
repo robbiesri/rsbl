@@ -1,0 +1,26 @@
+# External Dependencies Configuration
+# Define external dependencies to be downloaded as release archives
+# Each dependency is extracted to external/{name}/
+
+[[dependencies]]
+name = "doctest"
+url = "https://github.com/doctest/doctest/archive/refs/tags/v2.4.12.zip"
+version = "v2.4.12"
+strip_components = 1
+enabled = true
+
+[[dependencies]]
+name = "quill"
+url = "https://github.com/odygrd/quill/archive/refs/tags/v10.1.0.zip"
+version = "v10.1.0"
+strip_components = 1
+enabled = true
+
+# Add more dependencies by duplicating the [[dependencies]] section:
+#
+# [[dependencies]]
+# name = "glfw"
+# url = "https://github.com/glfw/glfw/archive/refs/tags/3.4.zip"
+# version = "3.4"
+# strip_components = 1  # Remove top-level directory from archive
+# enabled = true
