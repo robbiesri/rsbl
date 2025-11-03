@@ -27,3 +27,8 @@ target_link_libraries(${LIB_NAME}
         PUBLIC
         rsbl-core
 )
+
+if (WIN32)
+    # Override /Wall with /W3 for Windows implementation to reduce noise from Windows headers
+    target_compile_options(${LIB_NAME} PRIVATE /W3)
+endif ()
