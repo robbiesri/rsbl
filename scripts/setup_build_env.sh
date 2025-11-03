@@ -8,12 +8,15 @@ set -e
 PYTHON_TARGET_VERSION="3.13.9"
 CMAKE_TARGET_VERSION="4.1.2"
 NINJA_TARGET_VERSION="1.13.1"
+CLI11_TARGET_VERSION="2.6.1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_ENV_DIR="$REPO_ROOT/build_env"
 LOCAL_PYTHON_DIR="$BUILD_ENV_DIR/python"
 LOCAL_CMAKE_DIR="$BUILD_ENV_DIR/cmake"
 LOCAL_NINJA_DIR="$BUILD_ENV_DIR/ninja"
+CLI11_DIR="$REPO_ROOT/external/CLI11"
+CLI11_FILE="$CLI11_DIR/CLI11.hpp"
 
 # Color codes
 CYAN='\033[0;36m'
@@ -418,6 +421,75 @@ if [ "$NEEDS_NINJA" = true ]; then
 fi
 
 # ============================================================
+# CLI11 Setup
+# ============================================================
+
+echo -e "${CYAN}--- CLI11 Setup ---${NC}"
+echo ""
+
+NEEDS_CLI11=false
+
+# Check if CLI11.hpp already exists
+if [ -f "$CLI11_FILE" ]; then
+    echo -e "${GREEN}[OK] CLI11.hpp found${NC}"
+    echo -e "${GRAY}  Location: $CLI11_FILE${NC}"
+
+    # Check version in the file
+    if VERSION_LINE=$(head -1 "$CLI11_FILE" 2>&1 | grep -o "Version [0-9.]*"); then
+        echo -e "${GRAY}  $VERSION_LINE${NC}"
+        echo ""
+    else
+        echo -e "${YELLOW}[WARNING] Could not verify version, re-downloading...${NC}"
+        NEEDS_CLI11=true
+    fi
+else
+    NEEDS_CLI11=true
+fi
+
+if [ "$NEEDS_CLI11" = true ]; then
+    echo -e "${YELLOW}Downloading CLI11 v$CLI11_TARGET_VERSION...${NC}"
+    echo ""
+
+    # Create directory
+    mkdir -p "$CLI11_DIR"
+
+    # Build download URL
+    CLI11_DOWNLOAD_URL="https://github.com/CLIUtils/CLI11/releases/download/v$CLI11_TARGET_VERSION/CLI11.hpp"
+
+    echo -e "${GRAY}  Downloading from: $CLI11_DOWNLOAD_URL${NC}"
+    echo ""
+
+    # Download
+    if command -v curl &> /dev/null; then
+        curl -L -o "$CLI11_FILE" "$CLI11_DOWNLOAD_URL"
+    elif command -v wget &> /dev/null; then
+        wget -O "$CLI11_FILE" "$CLI11_DOWNLOAD_URL"
+    else
+        echo -e "${RED}[ERROR] Neither curl nor wget found. Please install one of them.${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}[OK] Download complete${NC}"
+
+    # Verify download
+    if [ -f "$CLI11_FILE" ]; then
+        echo ""
+        echo -e "${GREEN}[OK] CLI11.hpp installed at: $CLI11_FILE${NC}"
+
+        # Show version
+        if VERSION_LINE=$(head -1 "$CLI11_FILE" 2>&1 | grep -o "Version [0-9.]*"); then
+            echo -e "${GRAY}  $VERSION_LINE${NC}"
+        fi
+        echo ""
+    else
+        echo ""
+        echo -e "${RED}[ERROR] CLI11.hpp not found at expected location${NC}"
+        echo -e "${GRAY}  Expected: $CLI11_FILE${NC}"
+        exit 1
+    fi
+fi
+
+# ============================================================
 # Git Subtrees Setup
 # ============================================================
 
@@ -453,6 +525,7 @@ echo ""
 echo -e "${GRAY}Python: $LOCAL_PYTHON_EXE${NC}"
 echo -e "${GRAY}CMake:  $LOCAL_CMAKE_EXE${NC}"
 echo -e "${GRAY}Ninja:  $LOCAL_NINJA_EXE${NC}"
+echo -e "${GRAY}CLI11:  $CLI11_FILE${NC}"
 echo ""
 
 exit 0

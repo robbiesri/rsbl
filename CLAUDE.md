@@ -27,6 +27,8 @@ This script will:
 - Download and extract CMake 4.1.2 if not present
 - Check if Ninja 1.13.1 is already downloaded to `build_env/ninja/`
 - Download and extract Ninja 1.13.1 if not present
+- Check if CLI11 v2.6.1 is already downloaded to `external/CLI11/`
+- Download CLI11.hpp if not present
 - Verify all installations
 
 ### Using Local Tools
@@ -91,3 +93,19 @@ This repository is in its initial stages. The build environment setup is complet
 - **rsbl-platform**: Platform-specific implementations (currently Windows file I/O)
 - **gltf-viewer**: Example application
 - **Tests**: Comprehensive test suites for core components
+
+### External Dependencies
+
+- **doctest**: Testing framework (v2.4.12)
+- **quill**: High-performance logging library
+- **CLI11**: Command-line parsing library (v2.6.1, single-header at `external/CLI11/CLI11.hpp`)
+
+To use CLI11 in your code:
+```cpp
+#include <CLI11/CLI11.hpp>
+```
+
+Then in CMakeLists.txt, add the include directory:
+```cmake
+target_include_directories(your_target PRIVATE ${CMAKE_SOURCE_DIR}/external)
+```

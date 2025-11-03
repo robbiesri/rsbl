@@ -10,3 +10,6 @@ cmake-build*/
 
 # Ignore JetBrains generated project files
 .idea/
+
+# Release packages from public repos
+external/CLI11/

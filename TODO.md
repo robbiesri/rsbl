@@ -2,10 +2,8 @@
 
 ## General
 
-[x] Split code into libraries and apps
 [x] Create core library
 [x] Create platform library
-[x] Testing with doctest
 [x] Internal DynamicArray class
 [x] File handling APIs
 [x] Result API for error handling
@@ -17,8 +15,13 @@
 
 ## Infrastructure
 
-[ ] Pull down ninja binary for building (helps Claude run from CLI)
-[ ] Put cmake, python, and ninja all into the same folder?
+[x] Testing with doctest
+[x] Split code into libraries and apps
+[x] Subtrees for git dependencies
+[x] Pull down ninja binary for building (helps Claude run from CLI)
+[x] Put cmake, python, and ninja all into the same folder?
+[x] Command line options lib - CLI11
+[ ] Use release zips instead of subtrees?
 
 ## Render Architecture
 
