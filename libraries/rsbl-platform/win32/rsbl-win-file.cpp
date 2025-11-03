@@ -91,9 +91,25 @@ Result<uint64> WriteFile(FileHandle handle, const void* buffer, uint64 num_bytes
     return Result<uint64>(static_cast<uint64>(bytesWritten));
 }
 
-Result<uint64> ReadFile(FileHandle handle, void* buffer, uint64 num_bytes_to_read)
+Result<uint64> ReadFile(FileHandle handle, void* buffer, uint64 num_bytes_to_read, uint64 offset)
 {
     HANDLE win_handle = reinterpret_cast<HANDLE>(handle);
+
+    // Interestingly, Spectre mitigation cares if this is range checked (> 0)
+    // I might just enable this branch unconditionally because why not? This isn't really a 'fast'
+    // API.
+    if (offset != 0)
+    {
+        // Set file pointer to the specified offset
+        LARGE_INTEGER liOffset;
+        liOffset.QuadPart = static_cast<LONGLONG>(offset);
+
+        if (!SetFilePointerEx(win_handle, liOffset, nullptr, FILE_BEGIN))
+        {
+            return "Failed to seek to offset";
+        }
+    }
+
     DWORD bytesRead = 0;
 
     // Windows API uses DWORD (32-bit) for read size, so we need to handle large reads
@@ -102,11 +118,11 @@ Result<uint64> ReadFile(FileHandle handle, void* buffer, uint64 num_bytes_to_rea
         return "Read size exceeds maximum supported by Windows API";
     }
 
-    BOOL success = ::ReadFile(win_handle,
-                              buffer,
-                              static_cast<DWORD>(num_bytes_to_read),
-                              &bytesRead,
-                              nullptr); // Not using overlapped I/O
+    const BOOL success = ::ReadFile(win_handle,
+                                    buffer,
+                                    static_cast<DWORD>(num_bytes_to_read),
+                                    &bytesRead,
+                                    nullptr); // Not using overlapped I/O
 
     if (!success)
     {
@@ -116,26 +132,9 @@ Result<uint64> ReadFile(FileHandle handle, void* buffer, uint64 num_bytes_to_rea
     return static_cast<uint64>(bytesRead);
 }
 
-Result<uint64> ReadFile(FileHandle handle, void* buffer, uint64 num_bytes_to_read, uint64 offset)
-{
-    HANDLE winHandle = reinterpret_cast<HANDLE>(handle);
-
-    // Set file pointer to the specified offset
-    LARGE_INTEGER liOffset;
-    liOffset.QuadPart = static_cast<LONGLONG>(offset);
-
-    if (!SetFilePointerEx(winHandle, liOffset, nullptr, FILE_BEGIN))
-    {
-        return "Failed to seek to offset";
-    }
-
-    // Now perform the read
-    return ReadFile(handle, buffer, num_bytes_to_read);
-}
-
 Result<uint64> OpenAndReadFile(const char* path, void* buffer, uint64 num_bytes_to_read)
 {
-    auto openResult = OpenFile(path, FileOpenMode::Read);
+    auto openResult = rsbl::OpenFile(path, FileOpenMode::Read);
     if (openResult.Code() != ResultCode::Success)
     {
         return "Failed to open file for reading";
@@ -143,10 +142,10 @@ Result<uint64> OpenAndReadFile(const char* path, void* buffer, uint64 num_bytes_
 
     FileHandle handle = openResult.Value();
 
-    auto readResult = ReadFile(handle, buffer, num_bytes_to_read);
+    auto readResult = rsbl::ReadFile(handle, buffer, num_bytes_to_read);
 
     // Always try to close, even if read failed
-    auto closeResult = CloseFile(handle);
+    auto closeResult = rsbl::CloseFile(handle);
 
     // Return read result if successful, otherwise return close error or read error
     if (readResult.Code() != ResultCode::Success)
