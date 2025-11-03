@@ -1,8 +1,6 @@
 // Copyright 2025 Robert Srinivasiah
 // Licensed under the MIT License, see the LICENSE file for more info
 
-#include "../../external/CLI11/CLI11.hpp"
-
 #include <cstdio>
 #include <string>
 
