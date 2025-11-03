@@ -52,17 +52,17 @@ class [[nodiscard]] Result
   public:
     // We assume success when passed the ReturnType
     // Explicit was suggested by linter, not sure if it's worth the possibile usability issues
-    explicit Result(const ReturnType& value)
+    Result(const ReturnType& value)
     {
         new (m_valueBuffer) ReturnType(value);
     }
-    explicit Result(ReturnType&& value)
+    Result(ReturnType&& value)
     {
         new (m_valueBuffer) ReturnType(rsblMove(value));
     }
 
     // Lightweight code-only constructors. Success invokes default constructor
-    explicit Result(ResultCode code)
+    Result(ResultCode code)
         : m_code(code)
     {
         if (m_code == ResultCode::Success)
@@ -75,7 +75,7 @@ class [[nodiscard]] Result
     // args)
 
     // Moves
-    Result(Result&& other)
+    Result(Result&& other) noexcept
         : m_code(other.m_code)
     {
         if (m_code == ResultCode::Success)
@@ -86,7 +86,7 @@ class [[nodiscard]] Result
         }
     }
 
-    Result& operator=(Result&& other)
+    Result& operator=(Result&& other) noexcept
     {
         // TODO: do I even care about checking about assigning to it's own self?
 
@@ -135,14 +135,16 @@ class [[nodiscard]] Result
 
     // TODO: bool operator?
 
-    ResultCode Code() const
+    [[nodiscard]] ResultCode Code() const
     {
         return m_code;
     }
+
     ReturnType& Value()
     {
         return *reinterpret_cast<ReturnType*>(m_valueBuffer);
     }
+
     const ReturnType& Value() const
     {
         return *reinterpret_cast<const ReturnType*>(m_valueBuffer);
