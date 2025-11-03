@@ -24,3 +24,6 @@ enabled = true
 # version = "3.4"
 # strip_components = 1  # Remove top-level directory from archive
 # enabled = true
+
+# There's one extra dependency: CLI11. That is managed differently because it's just a single header release artifact
+# Maybe in the future we can just pull the whole release zip

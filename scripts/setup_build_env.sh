@@ -490,27 +490,21 @@ if [ "$NEEDS_CLI11" = true ]; then
 fi
 
 # ============================================================
-# Git Subtrees Setup
+# External Dependencies Setup
 # ============================================================
 
-echo -e "${CYAN}--- Git Subtrees Setup ---${NC}"
+echo -e "${CYAN}--- External Dependencies Setup ---${NC}"
 echo ""
 
-# Check if we're in a git repository
-if git rev-parse --git-dir > /dev/null 2>&1; then
-    SUBTREES_SCRIPT="$SCRIPT_DIR/setup_git_subtrees.py"
+EXTERNAL_DEPS_SCRIPT="$SCRIPT_DIR/download_external_deps.py"
 
-    if [ -f "$SUBTREES_SCRIPT" ]; then
-        echo -e "${YELLOW}Running git subtrees setup...${NC}"
-        echo ""
-        "$LOCAL_PYTHON_EXE" "$SUBTREES_SCRIPT"
-        echo ""
-    else
-        echo -e "${YELLOW}[WARNING] Git subtrees script not found at: $SUBTREES_SCRIPT${NC}"
-        echo ""
-    fi
+if [ -f "$EXTERNAL_DEPS_SCRIPT" ]; then
+    echo -e "${YELLOW}Downloading external dependencies...${NC}"
+    echo ""
+    "$LOCAL_PYTHON_EXE" "$EXTERNAL_DEPS_SCRIPT"
+    echo ""
 else
-    echo -e "${YELLOW}[INFO] Not a git repository, skipping subtrees setup${NC}"
+    echo -e "${YELLOW}[WARNING] External dependencies script not found at: $EXTERNAL_DEPS_SCRIPT${NC}"
     echo ""
 fi
 
