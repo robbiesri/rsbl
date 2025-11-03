@@ -14,6 +14,7 @@ add_executable(${APP_NAME}
 target_link_libraries(${APP_NAME}
         PUBLIC
         rsbl-platform
+        fastgltf
 )
 
 target_include_directories(${APP_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/CLI11)
