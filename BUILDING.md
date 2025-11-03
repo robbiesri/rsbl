@@ -55,3 +55,7 @@ examples.
 ```
 
 The first command sets up the build, and the second command actually builds the `rsbl-core` library target.
+
+### Convenience Script for Cmake + Ninja + MSVC
+
+Check out `scripts/setup_build.bat` to setup and build inside `cmake-test-ninja`!
