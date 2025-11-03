@@ -1,6 +1,10 @@
 # Local build environment (Python and CMake)
 build_env/
 
+# Scratch directory to test out cmake + ninja build environment
+cmake-test*/
+
+
 # CLion default CMake build folder
 cmake-build*/
 
