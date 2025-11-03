@@ -1,0 +1,32 @@
+# Asset Listing Configuration
+# This file defines external assets to be downloaded for development and testing
+# Run scripts/download_assets.py to download all assets to sample_assets/
+
+# Each asset entry should have:
+#   name = "descriptive-name"
+#   url = "URL to the asset or directory"
+#   type = "glb" (single file) or "gltf" (directory with textures)
+#   category = "optional category for organizing assets"
+
+[[assets]]
+name = "DamagedHelmet"
+url = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb"
+type = "glb"
+category = "gltf"
+description = "Sample glTF model - Damaged Helmet"
+
+[[assets]]
+name = "BoxTextured"
+url = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/BoxTextured/glTF-Binary/BoxTextured.glb"
+type = "glb"
+category = "gltf"
+description = "Simple textured cube - good for basic testing"
+
+[[assets]]
+name = "FlightHelmet"
+url = "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/FlightHelmet/glTF"
+type = "gltf"
+category = "gltf"
+description = "Flight Helmet model with separate textures"
+
+# Add more assets as needed following the same pattern

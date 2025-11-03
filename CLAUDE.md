@@ -31,6 +31,20 @@ This script will:
 - Download CLI11.hpp if not present
 - Verify all installations
 
+### Downloading Sample Assets
+
+The project includes sample assets (glTF models, etc.) for testing. Download them using:
+
+```bash
+./build_env/python/python.exe scripts/download_assets.py
+```
+
+Assets are defined in `asset_listing.toml` (tracked by git) and downloaded to `sample_assets/` (ignored by git).
+
+The script supports:
+- **glb files**: Single binary file download
+- **gltf files**: Full directory download including textures and associated files
+
 ### Using Local Tools
 
 After setup, use the local installations:
