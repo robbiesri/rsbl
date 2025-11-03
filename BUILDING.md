@@ -24,3 +24,34 @@ If you need to update the already existing subtrees, update `subtrees.toml` and 
 ```sh
 $ build_env/python/python.exe scripts/setup_git_subtrees.py --update
 ```
+
+### Visual Studio
+
+If you want to use Visual Studio as the generator, it's pretty simple with `-G`. Make sure you mark it with `-A x64` to
+get 64-bit builds, which are required!
+
+```shell
+> .\build_env\cmake\cmake-4.1.2-windows-x86_64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A x64 -S C:\funsrc\rsbl -B C:\funsrc\rsbl\cmake-test
+```
+
+### Ninja + MSVC
+
+If you want to use Ninja + MSVC, it's a bit trickier. You **need** to open the
+`x64 Native Tools Command Prompt for VS 2022`, and run `cmake` from that command prompt. There's really no other way to
+give `cmake` enough visibility into the MSVC toolchain. Too bad there isn't a clearer way to do this, since the Visual
+Studio path is so simple.
+
+```shell
+> .\build_env\cmake\cmake-4.1.2-windows-x86_64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/funsrc/rsbl/build_env/ninja/ninja.exe" -G Ninja -S C:\funsrc\rsbl -B C:\funsrc\rsbl\cmake-test-ninja
+> .\build_env\cmake\cmake-4.1.2-windows-x86_64\bin\cmake.exe --build C:\funsrc\rsbl\cmake-test-ninja --target rsbl-core -j 10
+```
+
+Claude suggested this setup, by invoking `vcvars64.bat`. This is a great idea, and I'm leaving both paths here as
+examples.
+
+```shell
+"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat" && cd "C:\funsrc\rsbl" && mkdir -p cmake-test-ninja && cd
+    cmake-test-ninja && cmake -G Ninja -DCMAKE_MAKE_PROGRAM="C:/funsrc/rsbl/build_env/ninja/ninja.exe" .. && cmake --build . --target rsbl-result-test
+```
+
+The first command sets up the build, and the second command actually builds the `rsbl-core` library target.
