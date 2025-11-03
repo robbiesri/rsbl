@@ -4,6 +4,7 @@
 list(APPEND PUBLIC_HEADER_FILES
         #        ${INCLUDE_DIR}/rsbl-assert.h
         include/rsbl-core.h
+        include/rsbl-dynamic-array.h
         include/rsbl-int-types.h
         include/rsbl-result.h
 )
@@ -35,3 +36,15 @@ target_link_libraries(rsbl-result-test
 )
 
 add_test(NAME rsbl-result-test COMMAND rsbl-result-test)
+
+add_executable(rsbl-dynamic-array-test
+        rsbl-dynamic-array.test.cpp
+)
+
+target_link_libraries(rsbl-dynamic-array-test
+        PRIVATE
+        rsbl-core
+        doctest::doctest
+)
+
+add_test(NAME rsbl-dynamic-array-test COMMAND rsbl-dynamic-array-test)
