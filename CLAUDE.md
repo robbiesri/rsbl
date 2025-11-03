@@ -48,6 +48,46 @@ After setup, use the local installations:
 .\build_env\ninja\ninja.exe [args]
 ```
 
+## Building the Project
+
+### Windows
+
+Use the `setup_build.bat` script which handles Visual Studio environment setup, CMake configuration, and building:
+
+```bash
+./scripts/setup_build.bat
+```
+
+This script will:
+1. Initialize the Visual Studio 2022 x64 environment (vcvars64.bat)
+2. Configure CMake with the Ninja generator using local tools from `build_env/`
+3. Build all targets
+
+**Build output location:** `cmake-test-ninja/bin/`
+
+**Note:** The script must be run from a fresh command prompt to ensure the Visual Studio environment is properly configured. Running it from Git Bash will work, but subsequent builds need the VS environment.
+
+### Running Tests
+
+After running `setup_build.bat`, test executables are in `cmake-test-ninja/bin/`:
+
+```bash
+# Run Result tests
+./cmake-test-ninja/bin/rsbl-result-test.exe
+
+# Run DynamicArray tests
+./cmake-test-ninja/bin/rsbl-dynamic-array-test.exe
+```
+
+All tests use the doctest framework and will report pass/fail status.
+
 ## Repository Status
 
 This repository is in its initial stages. The build environment setup is complete, ready for rendering framework development.
+
+### Current Components
+
+- **rsbl-core**: Core utilities including Result<T> for error handling and DynamicArray<T> for dynamic arrays
+- **rsbl-platform**: Platform-specific implementations (currently Windows file I/O)
+- **gltf-viewer**: Example application
+- **Tests**: Comprehensive test suites for core components
