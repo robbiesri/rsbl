@@ -1,12 +1,19 @@
 # Copyright 2025 Robert Srinivasiah
 # Licensed under the MIT License, see the LICENSE file for more info
 
+set(APP_NAME gltf-viewer)
+
 list(APPEND SRC_FILES
         gltf-viewer.cpp
 )
 
-add_executable(gltf-viewer
+add_executable(${APP_NAME}
         ${SRC_FILES}
 )
 
-# TODO: link the project libraries!
+target_link_libraries(${APP_NAME}
+        PUBLIC
+        rsbl-platform
+)
+
+target_include_directories(${APP_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/CLI11)
