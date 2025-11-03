@@ -7,9 +7,9 @@
 #   * Do I want VC 2022?
 #   * disable exception handling?
 
-# Enable all warnings
+# Enable almost all warnings. I tried /Wall, but there are too many stupid (and defaulted off) warnings from MSVC
 # TODO: maybe roll back to /W3 in the future?
-add_compile_options(/Wall)
+add_compile_options(/W4)
 
 # warnings as errors
 add_compile_options(/WX)
