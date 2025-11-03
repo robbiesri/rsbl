@@ -13,5 +13,8 @@ cmake-build*/
 # Ignore JetBrains generated project files
 .idea/
 
-# Release packages from public repos
+# External dependencies (downloaded from releases)
+# external_deps.toml is tracked
+external/doctest/
+external/quill/
 external/CLI11/
