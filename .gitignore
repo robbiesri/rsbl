@@ -17,4 +17,5 @@ cmake-build*/
 # external_deps.toml is tracked
 external/doctest/
 external/quill/
+external/fastgltf/
 external/CLI11/

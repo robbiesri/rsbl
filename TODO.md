@@ -21,7 +21,8 @@
 [x] Pull down ninja binary for building (helps Claude run from CLI)
 [x] Put cmake, python, and ninja all into the same folder?
 [x] Command line options lib - CLI11
-[ ] Use release zips instead of subtrees?
+[x] Use release zips instead of subtrees?
+[ ] Cache release zips on personal S3 bucket?
 
 ## Render Architecture
 
