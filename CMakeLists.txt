@@ -5,9 +5,9 @@ cmake_minimum_required(VERSION 3.28)
 
 project(rsbl)
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+if (CMAKE_SIZEOF_VOID_P EQUAL 4)
     message(FATAL_ERROR "32-bit builds not supported")
-endif()
+endif ()
 
 # Ignore MinSizeRel
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE)
@@ -25,10 +25,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-
 if (MSVC)
     include(msvc-defaults)
-endif()
+endif ()
 
 # Haven't thought about this much before, but Claude suggested it
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -45,5 +44,8 @@ enable_testing()
 include(test-helpers)
 
 add_subdirectory(libraries)
+
+# app specific dependencies
+add_subdirectory(external/fastgltf)
 
 add_subdirectory(apps)
