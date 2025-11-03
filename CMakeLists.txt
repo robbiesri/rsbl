@@ -48,4 +48,13 @@ add_subdirectory(libraries)
 # app specific dependencies
 add_subdirectory(external/fastgltf)
 
+# Disable warnings for fastgltf (external dependency)
+if (TARGET fastgltf)
+    if (MSVC)
+        target_compile_options(fastgltf PRIVATE /W0)
+    else()
+        target_compile_options(fastgltf PRIVATE -w)
+    endif()
+endif()
+
 add_subdirectory(apps)
