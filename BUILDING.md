@@ -19,8 +19,8 @@ $ scripts/setup_build_env.sh
 The definitions for what subtrees are downloaded are contained in `subtrees.toml`. The TOML should already
 be populated as part of this repo, and the subtrees will be pulled down as part of this repo.
 
-If you need to update the already existing subtrees, update `subtrees.toml` and then run: 
+If you need to update the already existing subtrees, update `subtrees.toml` and then run:
 
 ```sh
-$ python_local/python.exe scripts/setup_git_subtrees.py --update
+$ build_env/python/python.exe scripts/setup_git_subtrees.py --update
 ```

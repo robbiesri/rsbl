@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Environment Setup
 
-This project uses local installations of Python 3.13.9 and CMake 4.1.2 for development. Both are managed locally in the `python_local/` and `cmake_local/` directories.
+This project uses local installations of Python 3.13.9 and CMake 4.1.2 for development. Both are managed locally in the `build_env/` directory.
 
 ### Initial Setup
 
@@ -21,9 +21,9 @@ Run the unified setup script to ensure both Python and CMake are available:
 **Note:** On Windows, use Git Bash to run this script.
 
 This script will:
-- Check if Python 3.13.9 is already downloaded to `python_local/`
+- Check if Python 3.13.9 is already downloaded to `build_env/python/`
 - Download and extract Python 3.13.9 if not present
-- Check if CMake 4.1.2 is already downloaded to `cmake_local/`
+- Check if CMake 4.1.2 is already downloaded to `build_env/cmake/`
 - Download and extract CMake 4.1.2 if not present
 - Verify both installations
 
@@ -33,12 +33,12 @@ After setup, use the local installations:
 
 **Python:**
 ```powershell
-.\python_local\python.exe your_script.py
+.\build_env\python\python.exe your_script.py
 ```
 
 **CMake:**
 ```powershell
-.\cmake_local\cmake-4.1.2-windows-x86_64\bin\cmake.exe [args]
+.\build_env\cmake\cmake-4.1.2-windows-x86_64\bin\cmake.exe [args]
 ```
 
 ## Repository Status

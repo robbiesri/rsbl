@@ -1,8 +1,5 @@
-# Local Python installation
-python_local/
-
-# Local CMake installation
-cmake_local/
+# Local build environment (Python and CMake)
+build_env/
 
 # CLion default CMake build folder
 cmake-build*/

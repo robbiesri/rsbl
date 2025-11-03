@@ -9,8 +9,9 @@ PYTHON_TARGET_VERSION="3.13.9"
 CMAKE_TARGET_VERSION="4.1.2"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-LOCAL_PYTHON_DIR="$REPO_ROOT/python_local"
-LOCAL_CMAKE_DIR="$REPO_ROOT/cmake_local"
+BUILD_ENV_DIR="$REPO_ROOT/build_env"
+LOCAL_PYTHON_DIR="$BUILD_ENV_DIR/python"
+LOCAL_CMAKE_DIR="$BUILD_ENV_DIR/cmake"
 
 # Color codes
 CYAN='\033[0;36m'
