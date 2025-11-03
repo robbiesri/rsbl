@@ -41,6 +41,9 @@ add_subdirectory(external/quill)
 # TODO : control
 enable_testing()
 
+# Include test helpers
+include(test-helpers)
+
 add_subdirectory(libraries)
 
 add_subdirectory(apps)

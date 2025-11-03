@@ -25,26 +25,14 @@ target_include_directories(rsbl-core
 )
 
 # Tests
-add_executable(rsbl-result-test
-        rsbl-result.test.cpp
+rsbl_add_test(
+        NAME rsbl-result-test
+        SOURCES rsbl-result.test.cpp
+        LIBRARIES rsbl-core
 )
 
-target_link_libraries(rsbl-result-test
-        PRIVATE
-        rsbl-core
-        doctest::doctest
+rsbl_add_test(
+        NAME rsbl-dynamic-array-test
+        SOURCES rsbl-dynamic-array.test.cpp
+        LIBRARIES rsbl-core
 )
-
-add_test(NAME rsbl-result-test COMMAND rsbl-result-test)
-
-add_executable(rsbl-dynamic-array-test
-        rsbl-dynamic-array.test.cpp
-)
-
-target_link_libraries(rsbl-dynamic-array-test
-        PRIVATE
-        rsbl-core
-        doctest::doctest
-)
-
-add_test(NAME rsbl-dynamic-array-test COMMAND rsbl-dynamic-array-test)
