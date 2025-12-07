@@ -1,95 +1,112 @@
 // Copyright 2025 Robert Srinivasiah
 // Licensed under the MIT License, see the LICENSE file for more info
 
-#include <cstdio>
 #include <string>
 
 #include <CLI11.hpp>
 #include <fastgltf/core.hpp>
 #include <fastgltf/types.hpp>
+#include <quill/Backend.h>
+#include <quill/Frontend.h>
+#include <quill/LogMacros.h>
+#include <quill/Logger.h>
+#include <quill/sinks/ConsoleSink.h>
 
-void print_gltf_stats(const fastgltf::Asset& asset)
+void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
 {
-    printf("\n");
-    printf("=== glTF File Statistics ===\n");
-    printf("\n");
+    LOG_INFO(logger, "");
+    LOG_INFO(logger, "=== glTF File Statistics ===");
+    LOG_INFO(logger, "");
 
     // Basic counts
-    printf("Scenes:      %zu\n", asset.scenes.size());
-    printf("Nodes:       %zu\n", asset.nodes.size());
-    printf("Meshes:      %zu\n", asset.meshes.size());
-    printf("Materials:   %zu\n", asset.materials.size());
-    printf("Textures:    %zu\n", asset.textures.size());
-    printf("Images:      %zu\n", asset.images.size());
-    printf("Buffers:     %zu\n", asset.buffers.size());
-    printf("Animations:  %zu\n", asset.animations.size());
-    printf("Skins:       %zu\n", asset.skins.size());
-    printf("Cameras:     %zu\n", asset.cameras.size());
+    LOG_INFO(logger, "Scenes:      {}", asset.scenes.size());
+    LOG_INFO(logger, "Nodes:       {}", asset.nodes.size());
+    LOG_INFO(logger, "Meshes:      {}", asset.meshes.size());
+    LOG_INFO(logger, "Materials:   {}", asset.materials.size());
+    LOG_INFO(logger, "Textures:    {}", asset.textures.size());
+    LOG_INFO(logger, "Images:      {}", asset.images.size());
+    LOG_INFO(logger, "Buffers:     {}", asset.buffers.size());
+    LOG_INFO(logger, "Animations:  {}", asset.animations.size());
+    LOG_INFO(logger, "Skins:       {}", asset.skins.size());
+    LOG_INFO(logger, "Cameras:     {}", asset.cameras.size());
 
     // Mesh details
     if (!asset.meshes.empty())
     {
-        printf("\n");
-        printf("=== Mesh Details ===\n");
+        LOG_INFO(logger, "");
+        LOG_INFO(logger, "=== Mesh Details ===");
         size_t total_primitives = 0;
         for (size_t i = 0; i < asset.meshes.size(); ++i)
         {
             const auto& mesh = asset.meshes[i];
-            printf("  Mesh %zu: %zu primitive(s)", i, mesh.primitives.size());
             if (!mesh.name.empty())
             {
-                printf(" (name: %s)", mesh.name.c_str());
+                LOG_INFO(logger, "  Mesh {}: {} primitive(s) (name: {})", i, mesh.primitives.size(), mesh.name);
             }
-            printf("\n");
+            else
+            {
+                LOG_INFO(logger, "  Mesh {}: {} primitive(s)", i, mesh.primitives.size());
+            }
             total_primitives += mesh.primitives.size();
         }
-        printf("  Total primitives: %zu\n", total_primitives);
+        LOG_INFO(logger, "  Total primitives: {}", total_primitives);
     }
 
     // Material details
     if (!asset.materials.empty())
     {
-        printf("\n");
-        printf("=== Material Details ===\n");
+        LOG_INFO(logger, "");
+        LOG_INFO(logger, "=== Material Details ===");
         for (size_t i = 0; i < asset.materials.size(); ++i)
         {
             const auto& material = asset.materials[i];
-            printf("  Material %zu", i);
             if (!material.name.empty())
             {
-                printf(": %s", material.name.c_str());
+                LOG_INFO(logger, "  Material {}: {}", i, material.name);
             }
-            printf("\n");
+            else
+            {
+                LOG_INFO(logger, "  Material {}", i);
+            }
         }
     }
 
     // Buffer sizes
     if (!asset.buffers.empty())
     {
-        printf("\n");
-        printf("=== Buffer Information ===\n");
+        LOG_INFO(logger, "");
+        LOG_INFO(logger, "=== Buffer Information ===");
         size_t total_bytes = 0;
         for (size_t i = 0; i < asset.buffers.size(); ++i)
         {
             const auto& buffer = asset.buffers[i];
-            printf("  Buffer %zu: %zu bytes", i, buffer.byteLength);
             if (!buffer.name.empty())
             {
-                printf(" (name: %s)", buffer.name.c_str());
+                LOG_INFO(logger, "  Buffer {}: {} bytes (name: {})", i, buffer.byteLength, buffer.name);
             }
-            printf("\n");
+            else
+            {
+                LOG_INFO(logger, "  Buffer {}: {} bytes", i, buffer.byteLength);
+            }
             total_bytes += buffer.byteLength;
         }
-        printf("  Total buffer size: %.2f KB (%.2f MB)\n",
-               total_bytes / 1024.0,
-               total_bytes / (1024.0 * 1024.0));
+        LOG_INFO(logger, "  Total buffer size: {:.2f} KB ({:.2f} MB)",
+                 total_bytes / 1024.0,
+                 total_bytes / (1024.0 * 1024.0));
     }
 
-    printf("\n");
+    LOG_INFO(logger, "");
 }
 
 int main(int argc, char** argv)
 {
+    // Initialize quill backend
+    quill::Backend::start();
+
+    // Create console sink and logger
+    auto console_sink = quill::Frontend::create_or_get_sink<quill::ConsoleSink>("console_sink");
+    quill::Logger* logger = quill::Frontend::create_or_get_logger("gltf_viewer", std::move(console_sink));
+
     CLI::App app("GLTF viewer");
 
     std::string file_path;
@@ -97,7 +114,7 @@ int main(int argc, char** argv)
 
     CLI11_PARSE(app, argc, argv);
 
-    printf("Loading glTF file: %s\n", file_path.c_str());
+    LOG_INFO(logger, "Loading glTF file: {}", file_path);
 
     // Create fastgltf parser
     fastgltf::Parser parser;
@@ -106,9 +123,7 @@ int main(int argc, char** argv)
     auto data = fastgltf::GltfDataBuffer::FromPath(file_path);
     if (data.error() != fastgltf::Error::None)
     {
-        fprintf(stderr,
-                "ERROR: Failed to load file: %s\n",
-                fastgltf::getErrorMessage(data.error()).data());
+        LOG_ERROR(logger, "Failed to load file: {}", fastgltf::getErrorMessage(data.error()));
         return 1;
     }
 
@@ -121,16 +136,14 @@ int main(int argc, char** argv)
         parser.loadGltf(data.get(), std::filesystem::path(file_path).parent_path(), gltfOptions);
     if (asset.error() != fastgltf::Error::None)
     {
-        fprintf(stderr,
-                "ERROR: Failed to parse glTF: %s\n",
-                fastgltf::getErrorMessage(asset.error()).data());
+        LOG_ERROR(logger, "Failed to parse glTF: {}", fastgltf::getErrorMessage(asset.error()));
         return 1;
     }
 
-    printf("Successfully loaded glTF file!\n");
+    LOG_INFO(logger, "Successfully loaded glTF file!");
 
     // Print statistics
-    print_gltf_stats(asset.get());
+    print_gltf_stats(asset.get(), logger);
 
     return 0;
 }
