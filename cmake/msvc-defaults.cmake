@@ -9,7 +9,7 @@
 
 # Enable almost all warnings. I tried /Wall, but there are too many stupid (and defaulted off) warnings from MSVC
 # TODO: maybe roll back to /W3 in the future?
-add_compile_options(/W4)
+add_compile_options(/W3)
 
 # warnings as errors
 add_compile_options(/WX)
