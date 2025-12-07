@@ -110,8 +110,14 @@ int main(int argc, char** argv)
     // Initialize quill backend
     quill::Backend::start();
 
-    // Create console sink
-    auto console_sink = quill::Frontend::create_or_get_sink<quill::ConsoleSink>("console_sink");
+    // Create console sink with custom pattern (just the message)
+    auto console_sink =
+        quill::Frontend::create_or_get_sink<quill::ConsoleSink>("console_sink", []() {
+            quill::ConsoleSinkConfig config;
+            config.set_override_pattern_formatter_options(quill::PatternFormatterOptions{
+                "%(time) %(thread_id) %(file_name):%(line_number) %(message)"});
+            return config;
+        }());
 
     // Create rotating file sink that rotates daily
     auto file_sink =
