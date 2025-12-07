@@ -11,6 +11,7 @@
 #include <quill/LogMacros.h>
 #include <quill/Logger.h>
 #include <quill/sinks/ConsoleSink.h>
+#include <quill/sinks/RotatingFileSink.h>
 
 void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
 {
@@ -41,7 +42,11 @@ void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
             const auto& mesh = asset.meshes[i];
             if (!mesh.name.empty())
             {
-                LOG_INFO(logger, "  Mesh {}: {} primitive(s) (name: {})", i, mesh.primitives.size(), mesh.name);
+                LOG_INFO(logger,
+                         "  Mesh {}: {} primitive(s) (name: {})",
+                         i,
+                         mesh.primitives.size(),
+                         mesh.name);
             }
             else
             {
@@ -82,7 +87,8 @@ void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
             const auto& buffer = asset.buffers[i];
             if (!buffer.name.empty())
             {
-                LOG_INFO(logger, "  Buffer {}: {} bytes (name: {})", i, buffer.byteLength, buffer.name);
+                LOG_INFO(
+                    logger, "  Buffer {}: {} bytes (name: {})", i, buffer.byteLength, buffer.name);
             }
             else
             {
@@ -90,7 +96,8 @@ void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
             }
             total_bytes += buffer.byteLength;
         }
-        LOG_INFO(logger, "  Total buffer size: {:.2f} KB ({:.2f} MB)",
+        LOG_INFO(logger,
+                 "  Total buffer size: {:.2f} KB ({:.2f} MB)",
                  total_bytes / 1024.0,
                  total_bytes / (1024.0 * 1024.0));
     }
@@ -103,9 +110,21 @@ int main(int argc, char** argv)
     // Initialize quill backend
     quill::Backend::start();
 
-    // Create console sink and logger
+    // Create console sink
     auto console_sink = quill::Frontend::create_or_get_sink<quill::ConsoleSink>("console_sink");
-    quill::Logger* logger = quill::Frontend::create_or_get_logger("gltf_viewer", std::move(console_sink));
+
+    // Create rotating file sink that rotates daily
+    auto file_sink =
+        quill::Frontend::create_or_get_sink<quill::RotatingFileSink>("logs/gltf_viewer.log", []() {
+            quill::RotatingFileSinkConfig config;
+            config.set_rotation_time_daily("00:00"); // Rotate at midnight
+            config.set_max_backup_files(30);         // Keep 30 days of logs
+            return config;
+        }());
+
+    // Create logger with both sinks
+    quill::Logger* logger = quill::Frontend::create_or_get_logger(
+        "gltf_viewer", {std::move(console_sink), std::move(file_sink)});
 
     CLI::App app("GLTF viewer");
 
