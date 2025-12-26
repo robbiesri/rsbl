@@ -136,7 +136,10 @@ class [[nodiscard]] Result
         }
     }
 
-    // TODO: bool operator?
+    explicit operator bool() const
+    {
+        return m_code == ResultCode::Success;
+    }
 
     [[nodiscard]] ResultCode Code() const
     {
