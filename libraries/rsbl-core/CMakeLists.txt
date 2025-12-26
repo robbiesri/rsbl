@@ -2,7 +2,7 @@
 # Licensed under the MIT License, see the LICENSE file for more info
 
 list(APPEND PUBLIC_HEADER_FILES
-        #        ${INCLUDE_DIR}/rsbl-assert.h
+        include/rsbl-assert.h
         include/rsbl-core.h
         include/rsbl-dynamic-array.h
         include/rsbl-int-types.h
@@ -10,7 +10,7 @@ list(APPEND PUBLIC_HEADER_FILES
 )
 
 list(APPEND PRIVATE_SOURCE_FILES
-        #        ${SRC_DIR}/rsbl-assert.cpp
+        rsbl-assert.cpp
         rsbl-result.cpp
 )
 

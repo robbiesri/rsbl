@@ -7,11 +7,12 @@
 [x] Internal DynamicArray class
 [x] File handling APIs
 [x] Result API for error handling
-[ ] Assert implementation
+[x] Assert implementation
 [ ] Create render library
 [ ] Set up support for DX12 and Vulkan
 [ ] Create simple app that loads GLTF, and renders in real time
 [ ] Add IMGUI to window to give controls
+[ ] asset manager
 
 ## Infrastructure
 
