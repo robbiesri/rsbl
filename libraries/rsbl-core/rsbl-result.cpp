@@ -3,6 +3,8 @@
 
 #include "include/rsbl-result.h"
 
+#include "include/rsbl-assert.h"
+
 #include <string>
 
 // TODO: test sizes of Result with different ReturnTypes
@@ -20,7 +22,7 @@ void SetFailureText(const char* text)
         return;
     }
 
-    // rsblAssert(text != nullptr);
+    rsblAssert(text != nullptr);
 
     s_failureTextStr = text;
 }
