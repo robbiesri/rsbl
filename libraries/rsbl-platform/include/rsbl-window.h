@@ -10,14 +10,15 @@
 // TODO: Handle Window callback (for imgui stuff)
 // TODO: Cursor management?
 // TODO: Explicit message pumping?
+// TODO: vector types like uint2
 
 namespace rsbl
 {
 
 // Opaque handle to platform-specific window data
-struct WindowNativeHandle
+struct WindowNativeData
 {
-    void* platform_data;
+    void* platform_handle;
 };
 
 class Window
@@ -29,16 +30,13 @@ class Window
     // Destructor
     ~Window();
 
-    // Delete copy constructor and copy assignment (not copyable)
+    // Moveable, not copyable
+    Window(Window&&) noexcept = default;
+    Window& operator=(Window&&) noexcept = default;
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
 
-    // Default move constructor and move assignment (moveable)
-    Window(Window&&) noexcept = default;
-    Window& operator=(Window&&) noexcept = default;
-
-    // Get platform-specific window data
-    WindowNativeHandle GetNativeHandle() const;
+    WindowNativeData GetNativeData() const;
 
     // Window management methods
     void Show();
@@ -46,33 +44,33 @@ class Window
     bool IsVisible() const;
 
     // Dimension and position accessors
-    uint32 GetWidth() const
+    uint32 Width() const
     {
-        return width_;
+        return m_width;
     }
-    uint32 GetHeight() const
+    uint32 Height() const
     {
-        return height_;
+        return m_height;
     }
-    int32 GetX() const
+    int32 X() const
     {
-        return x_;
+        return m_x;
     }
-    int32 GetY() const
+    int32 Y() const
     {
-        return y_;
+        return m_y;
     }
 
   private:
     // Private constructor - use Create() factory method
     Window(uint32 width, uint32 height, int32 x, int32 y);
-    uint32 width_;
-    uint32 height_;
-    int32 x_;
-    int32 y_;
+    uint32 m_width;
+    uint32 m_height;
+    int32 m_x;
+    int32 m_y;
 
     // Platform-specific implementation data
-    void* platform_window_;
+    WindowNativeData m_platformData;
 };
 
 } // namespace rsbl
