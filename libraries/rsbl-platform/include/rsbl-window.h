@@ -6,6 +6,11 @@
 #include <rsbl-int-types.h>
 #include <rsbl-result.h>
 
+// TODO: capture input state
+// TODO: Handle Window callback (for imgui stuff)
+// TODO: Cursor management?
+// TODO: Explicit message pumping?
+
 namespace rsbl
 {
 
@@ -17,9 +22,9 @@ struct WindowNativeHandle
 
 class Window
 {
-public:
-    // Constructor with required width/height and optional position
-    Window(uint32 width, uint32 height, int32 x = -1, int32 y = -1);
+  public:
+    // Factory method to create a window
+    static Result<Window*> Create(uint32 width, uint32 height, int32 x = -1, int32 y = -1);
 
     // Destructor
     ~Window();
@@ -41,12 +46,26 @@ public:
     bool IsVisible() const;
 
     // Dimension and position accessors
-    uint32 GetWidth() const { return width_; }
-    uint32 GetHeight() const { return height_; }
-    int32 GetX() const { return x_; }
-    int32 GetY() const { return y_; }
+    uint32 GetWidth() const
+    {
+        return width_;
+    }
+    uint32 GetHeight() const
+    {
+        return height_;
+    }
+    int32 GetX() const
+    {
+        return x_;
+    }
+    int32 GetY() const
+    {
+        return y_;
+    }
 
-private:
+  private:
+    // Private constructor - use Create() factory method
+    Window(uint32 width, uint32 height, int32 x, int32 y);
     uint32 width_;
     uint32 height_;
     int32 x_;
