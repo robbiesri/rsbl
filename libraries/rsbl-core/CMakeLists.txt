@@ -37,3 +37,9 @@ rsbl_add_test(
         SOURCES rsbl-dynamic-array.test.cpp
         LIBRARIES rsbl-core
 )
+
+rsbl_add_test(
+        NAME rsbl-math-test
+        SOURCES rsbl-math.test.cpp
+        LIBRARIES rsbl-core
+)

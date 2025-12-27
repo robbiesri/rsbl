@@ -5,6 +5,9 @@
 
 #include "rsbl-int-types.h"
 
+// TODO: constructors that take in fixed size arrays
+// TODO: interop with DirectXMath types
+
 namespace rsbl
 {
 
