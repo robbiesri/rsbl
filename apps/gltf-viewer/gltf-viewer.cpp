@@ -176,7 +176,6 @@ int main(int argc, char** argv)
     if (window_create_result)
     {
         rsbl::Window* win = window_create_result.Value();
-        win->Show();
     }
 
     return 0;

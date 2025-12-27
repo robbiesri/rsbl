@@ -9,7 +9,6 @@
 // TODO: Set a pointer to the window impl class via SetWindowLongPtrA
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
 // how it affects DX/Vulkan API interactions
-// TODO: Show window right away after creation
 // TODO: use AdjustWindowRect to correct rect based on position, size and actual display properties
 // TODO: Handle WM_CLOSE and WM_DESTROY properly
 // TODO: Handle resizing (WM_SIZE?)
@@ -76,29 +75,28 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
 {
     // Ensure window class is registered
-    auto registerResult = RegisterWindowClass();
-    if (registerResult.Code() != ResultCode::Success)
+    if (auto registerResult = RegisterWindowClass(); registerResult.Code() != ResultCode::Success)
     {
         return "Failed to register window class";
     }
 
     // If position is -1, use default positioning (CW_USEDEFAULT)
-    int posX = (x == -1) ? CW_USEDEFAULT : x;
-    int posY = (y == -1) ? CW_USEDEFAULT : y;
+    const int posX = (x == -1) ? CW_USEDEFAULT : x;
+    const int posY = (y == -1) ? CW_USEDEFAULT : y;
 
     // Create the window (initially hidden)
-    HWND hwnd = CreateWindowExA(0,                        // Extended window style
-                                WINDOW_CLASS_NAME,        // Window class name
-                                "RSBL Window",            // Window title
-                                WS_OVERLAPPEDWINDOW,      // Window style
-                                posX,                     // X position
-                                posY,                     // Y position
-                                static_cast<int>(width),  // Width
-                                static_cast<int>(height), // Height
-                                nullptr,                  // Parent window
-                                nullptr,                  // Menu
-                                GetModuleHandle(nullptr), // Instance
-                                nullptr);                 // Additional data
+    const HWND hwnd = CreateWindowExA(0,                        // Extended window style
+                                      WINDOW_CLASS_NAME,        // Window class name
+                                      "RSBL Window",            // Window title
+                                      WS_OVERLAPPEDWINDOW,      // Window style
+                                      posX,                     // X position
+                                      posY,                     // Y position
+                                      static_cast<int>(width),  // Width
+                                      static_cast<int>(height), // Height
+                                      nullptr,                  // Parent window
+                                      nullptr,                  // Menu
+                                      GetModuleHandle(nullptr), // Instance
+                                      nullptr);                 // Additional data
 
     if (hwnd == nullptr)
     {
@@ -108,6 +106,8 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     // Allocate and initialize the Window object
     Window* window = new Window(width, height, x, y);
     window->m_platformData.platform_handle = hwnd;
+
+    window->Show();
 
     return window;
 }
