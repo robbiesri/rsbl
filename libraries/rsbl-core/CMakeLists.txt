@@ -7,6 +7,7 @@ list(APPEND PUBLIC_HEADER_FILES
         include/rsbl-dynamic-array.h
         include/rsbl-int-types.h
         include/rsbl-math-types.h
+        include/rsbl-ptr.h
         include/rsbl-result.h
 )
 
@@ -41,5 +42,11 @@ rsbl_add_test(
 rsbl_add_test(
         NAME rsbl-math-test
         SOURCES rsbl-math.test.cpp
+        LIBRARIES rsbl-core
+)
+
+rsbl_add_test(
+        NAME rsbl-ptr-test
+        SOURCES rsbl-ptr.test.cpp
         LIBRARIES rsbl-core
 )
