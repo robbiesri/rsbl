@@ -10,9 +10,9 @@
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
 // how it affects DX/Vulkan API interactions
 // TODO: use AdjustWindowRect to correct rect based on position, size and actual display properties
-// TODO: Handle WM_CLOSE and WM_DESTROY properly
 // TODO: Handle resizing (WM_SIZE?)
 // TODO: hook into imgui window management
+// TODO: do I really need the hbrBackground? When we are doing rendering?
 
 namespace rsbl
 {
@@ -41,6 +41,8 @@ static Result<> RegisterWindowClass()
     wc.hInstance = GetModuleHandle(nullptr);
     wc.hIcon = nullptr;
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    // lol, converting from color types to HBRUSH, we need to offset by 1. Insanity
+    // See: https://www.gamedev.net/forums/topic/440835-what-is-color_window/?page=2
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = WINDOW_CLASS_NAME;
@@ -55,16 +57,16 @@ static Result<> RegisterWindowClass()
     return ResultCode::Success;
 }
 
-// Window procedure for handling messages
+// We can expect WM_CLOSE -> WM_DESTROY -> WM_QUIT. Some of it is explained here:
+// https://stackoverflow.com/questions/3155782/what-is-the-difference-between-wm-quit-wm-close-and-wm-destroy-in-a-windows-pr
+// I'm just going to handle DESTROY, and let windows handle CLOSE and QUIT (though I'm kinda
+// invoking QUIT by caling PostQuitMessage).
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
-    case WM_CLOSE:
-        // Don't destroy the window automatically, let the application control it
-        return 0;
-
     case WM_DESTROY:
+        ::PostQuitMessage(0);
         return 0;
 
     default:

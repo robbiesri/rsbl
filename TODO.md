@@ -8,6 +8,8 @@
 [x] File handling APIs
 [x] Result API for error handling
 [x] Assert implementation
+[ ] Window management system for platform
+[ ] Barebones smart pointers
 [ ] Create render library
 [ ] Set up support for DX12 and Vulkan
 [ ] Create simple app that loads GLTF, and renders in real time
