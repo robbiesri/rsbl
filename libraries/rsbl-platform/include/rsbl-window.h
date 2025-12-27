@@ -3,14 +3,13 @@
 
 #pragma once
 
-#include <rsbl-int-types.h>
+#include <rsbl-math-types.h>
 #include <rsbl-result.h>
 
 // TODO: capture input state
 // TODO: Handle Window callback (for imgui stuff)
 // TODO: Cursor management?
 // TODO: Explicit message pumping?
-// TODO: vector types like uint2
 // TODO: handle fullscreen, esp relevant for mobile
 // TODO: Surface the window and client regions thru Window API?
 
@@ -48,28 +47,35 @@ class Window
     // Dimension and position accessors
     uint32 Width() const
     {
-        return m_width;
+        return m_size.x;
     }
     uint32 Height() const
     {
-        return m_height;
+        return m_size.y;
     }
     int32 X() const
     {
-        return m_x;
+        return m_position.x;
     }
     int32 Y() const
     {
-        return m_y;
+        return m_position.y;
+    }
+
+    uint2 Size() const
+    {
+        return m_size;
+    }
+    int2 Position() const
+    {
+        return m_position;
     }
 
   private:
     // Private constructor - use Create() factory method
     Window(uint32 width, uint32 height, int32 x, int32 y);
-    uint32 m_width;
-    uint32 m_height;
-    int32 m_x;
-    int32 m_y;
+    uint2 m_size;
+    int2 m_position;
 
     // Platform-specific implementation data
     WindowNativeData m_platformData;

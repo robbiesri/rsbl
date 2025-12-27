@@ -139,8 +139,8 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     RECT created_window_rect;
     if (GetWindowRect(hwnd, &created_window_rect))
     {
-        window->m_x = created_window_rect.left;
-        window->m_y = created_window_rect.top;
+        window->m_position.x = created_window_rect.left;
+        window->m_position.y = created_window_rect.top;
     }
     else
     {
@@ -152,9 +152,8 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     RECT created_client_rect;
     if (GetClientRect(hwnd, &created_client_rect))
     {
-        window->m_width = static_cast<uint32>(created_client_rect.right - created_client_rect.left);
-        window->m_height =
-            static_cast<uint32>(created_client_rect.bottom - created_client_rect.top);
+        window->m_size.x = static_cast<uint32>(created_client_rect.right - created_client_rect.left);
+        window->m_size.y = static_cast<uint32>(created_client_rect.bottom - created_client_rect.top);
     }
 
     window->Show();
@@ -163,10 +162,8 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
 }
 
 Window::Window(uint32 width, uint32 height, int32 x, int32 y)
-    : m_width(width)
-    , m_height(height)
-    , m_x(x)
-    , m_y(y)
+    : m_size(width, height)
+    , m_position(x, y)
     , m_platformData{nullptr}
 {
 }
