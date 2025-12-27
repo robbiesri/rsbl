@@ -6,6 +6,7 @@ list(APPEND PUBLIC_HEADER_FILES
         include/rsbl-core.h
         include/rsbl-dynamic-array.h
         include/rsbl-int-types.h
+        include/rsbl-math-types.h
         include/rsbl-result.h
 )
 
