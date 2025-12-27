@@ -5,11 +5,13 @@ set(LIB_NAME rsbl-platform)
 
 list(APPEND PUBLIC_HEADER_FILES
         include/rsbl-file.h
+        include/rsbl-window.h
 )
 
 if (WIN32)
     list(APPEND PRIVATE_SOURCE_FILES
             win32/rsbl-win-file.cpp
+            win32/rsbl-win-window.cpp
     )
 endif ()
 
