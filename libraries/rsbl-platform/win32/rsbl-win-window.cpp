@@ -9,6 +9,8 @@
 // how it affects DX/Vulkan API interactions
 // TODO: Handle resizing (WM_SIZE?)
 // TODO: hook into imgui window management
+// TODO: add logger support to notify about window creation and possible failures
+// TODO: add window tests? Not sure how they'd actually look
 
 namespace rsbl
 {
@@ -16,9 +18,6 @@ namespace rsbl
 // Window class name for registration
 static const char* WINDOW_CLASS_NAME = "RSBLWindowClass";
 static bool s_windowClassRegistered = false;
-
-// Forward declaration for window procedure
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // Register the window class (only needs to happen once)
 static Result<> RegisterWindowClass()
@@ -31,7 +30,7 @@ static Result<> RegisterWindowClass()
     WNDCLASSEXA wc;
     wc.cbSize = sizeof(WNDCLASSEXA);
     wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
+    wc.lpfnWndProc = reinterpret_cast<WNDPROC>(Window::WindowProc);
     wc.cbClsExtra = 0;
     wc.cbWndExtra = sizeof(Window*); // Allocate space for Window pointer
     wc.hInstance = GetModuleHandle(nullptr);
@@ -58,12 +57,18 @@ static Result<> RegisterWindowClass()
 // https://stackoverflow.com/questions/3155782/what-is-the-difference-between-wm-quit-wm-close-and-wm-destroy-in-a-windows-pr
 // I'm just going to handle DESTROY, and let windows handle CLOSE and QUIT (though I'm kinda
 // invoking QUIT by caling PostQuitMessage).
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+long long Window::WindowProc(void* handle,
+                             unsigned int uMsg,
+                             unsigned long long wParam,
+                             long long lParam)
 {
+
+    auto hwnd = static_cast<HWND>(handle);
+
     // Retrieve the Window pointer stored in the window's user data
     // Before we call SetWindowLongPtrA, this will be nullptr. So make we check if window is valid
     // first!
-    Window* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
+    auto* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
 
     switch (uMsg)
     {
@@ -152,8 +157,10 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     RECT created_client_rect;
     if (GetClientRect(hwnd, &created_client_rect))
     {
-        window->m_size.x = static_cast<uint32>(created_client_rect.right - created_client_rect.left);
-        window->m_size.y = static_cast<uint32>(created_client_rect.bottom - created_client_rect.top);
+        window->m_size.x =
+            static_cast<uint32>(created_client_rect.right - created_client_rect.left);
+        window->m_size.y =
+            static_cast<uint32>(created_client_rect.bottom - created_client_rect.top);
     }
 
     window->Show();

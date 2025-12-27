@@ -71,7 +71,18 @@ class Window
         return m_position;
     }
 
-  private:
+    // Unfortunate to leak some platform-specific bits into header, but this is simpler than doing
+    // some PIMPL thing
+#ifdef _WIN32
+    // Platform-specific window procedure
+    static long long WindowProc(void* handle,
+                                unsigned int uMsg,
+                                unsigned long long wParam,
+                                long long lParam);
+
+#endif
+
+  protected:
     // Private constructor - use Create() factory method
     Window(uint32 width, uint32 height, int32 x, int32 y);
     uint2 m_size;
