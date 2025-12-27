@@ -12,7 +12,6 @@
 // TODO: use AdjustWindowRect to correct rect based on position, size and actual display properties
 // TODO: Handle resizing (WM_SIZE?)
 // TODO: hook into imgui window management
-// TODO: Query and update actual window position + size from API
 
 namespace rsbl
 {
@@ -78,22 +77,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
 {
     // Ensure window class is registered
-    if (auto registerResult = RegisterWindowClass(); registerResult.Code() != ResultCode::Success)
+    if (auto register_result = RegisterWindowClass(); register_result.Code() != ResultCode::Success)
     {
         return "Failed to register window class";
     }
 
     // If position is -1, use default positioning (CW_USEDEFAULT)
-    const int posX = (x == -1) ? CW_USEDEFAULT : x;
-    const int posY = (y == -1) ? CW_USEDEFAULT : y;
+    const int pos_x = (x == -1) ? CW_USEDEFAULT : x;
+    const int pos_y = (y == -1) ? CW_USEDEFAULT : y;
 
     // Create the window (initially hidden)
     const HWND hwnd = CreateWindowExA(0,                        // Extended window style
                                       WINDOW_CLASS_NAME,        // Window class name
                                       "RSBL Window",            // Window title
                                       WS_OVERLAPPEDWINDOW,      // Window style
-                                      posX,                     // X position
-                                      posY,                     // Y position
+                                      pos_x,                    // X position
+                                      pos_y,                    // Y position
                                       static_cast<int>(width),  // Width
                                       static_cast<int>(height), // Height
                                       nullptr,                  // Parent window
@@ -109,6 +108,20 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     // Allocate and initialize the Window object
     Window* window = new Window(width, height, x, y);
     window->m_platformData.platform_handle = hwnd;
+
+    // Query the actual window position and size from Windows
+    RECT window_rect;
+    if (GetWindowRect(hwnd, &window_rect))
+    {
+        window->m_x = window_rect.left;
+        window->m_y = window_rect.top;
+        window->m_width = static_cast<uint32>(window_rect.right - window_rect.left);
+        window->m_height = static_cast<uint32>(window_rect.bottom - window_rect.top);
+    }
+    else
+    {
+        // TODO: log warning? We can't do much, but failing GetWinowRect sems bad.
+    }
 
     window->Show();
 
