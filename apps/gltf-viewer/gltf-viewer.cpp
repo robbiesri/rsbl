@@ -1,7 +1,7 @@
 // Copyright 2025 Robert Srinivasiah
 // Licensed under the MIT License, see the LICENSE file for more info
 
-#include <string>
+#include <rsbl-window.h>
 
 #include <CLI11.hpp>
 #include <fastgltf/core.hpp>
@@ -12,6 +12,8 @@
 #include <quill/Logger.h>
 #include <quill/sinks/ConsoleSink.h>
 #include <quill/sinks/RotatingFileSink.h>
+
+#include <string>
 
 void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
 {
@@ -169,6 +171,13 @@ int main(int argc, char** argv)
 
     // Print statistics
     print_gltf_stats(asset.get(), logger);
+
+    auto window_create_result = rsbl::Window::Create(640, 480);
+    if (window_create_result)
+    {
+        rsbl::Window* win = window_create_result.Value();
+        win->Show();
+    }
 
     return 0;
 }
