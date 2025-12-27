@@ -172,11 +172,23 @@ int main(int argc, char** argv)
     // Print statistics
     print_gltf_stats(asset.get(), logger);
 
+    LOG_INFO(logger, "Starting window...");
+    rsbl::Window* win = nullptr;
     auto window_create_result = rsbl::Window::Create(640, 480);
     if (window_create_result)
     {
-        rsbl::Window* win = window_create_result.Value();
+        LOG_INFO(logger, "Window created successfully!");
+        win = window_create_result.Value();
     }
+    else
+    {
+        LOG_ERROR(logger, "Failed to create window: {}", window_create_result.FailureText());
+        return 1;
+    }
+
+    // TODO: Window event loop
+
+    delete win;
 
     return 0;
 }
