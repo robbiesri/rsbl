@@ -5,8 +5,6 @@
 
 #include <windows.h>
 
-// TODO: Allocate space for a window pointer in WNDCLASSEXA.cbWndExtra
-// TODO: Set a pointer to the window impl class via SetWindowLongPtrA
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
 // how it affects DX/Vulkan API interactions
 // TODO: Handle resizing (WM_SIZE?)
@@ -35,7 +33,7 @@ static Result<> RegisterWindowClass()
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = WindowProc;
     wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
+    wc.cbWndExtra = sizeof(Window*); // Allocate space for Window pointer
     wc.hInstance = GetModuleHandle(nullptr);
     wc.hIcon = nullptr;
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
@@ -62,8 +60,20 @@ static Result<> RegisterWindowClass()
 // invoking QUIT by caling PostQuitMessage).
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    // Retrieve the Window pointer stored in the window's user data
+    // Before we call SetWindowLongPtrA, this will be nullptr. So make we check if window is valid
+    // first!
+    Window* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
+
     switch (uMsg)
     {
+    case WM_SIZE:
+        // Window has been resized
+        // lParam contains LOWORD = new width, HIWORD = new height
+        // We acknowledge the event but don't update m_width/m_height here
+        // The application can query the actual size as needed
+        return 0;
+
     case WM_DESTROY:
         ::PostQuitMessage(0);
         return 0;
@@ -121,6 +131,9 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     // Allocate and initialize the Window object
     Window* window = new Window(width, height, x, y);
     window->m_platformData.platform_handle = hwnd;
+
+    // Store the Window pointer in the window's user data for access in WindowProc
+    SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
 
     // Query the actual window position and size from Windows, but retain the expected 'client' area
     RECT created_window_rect;
