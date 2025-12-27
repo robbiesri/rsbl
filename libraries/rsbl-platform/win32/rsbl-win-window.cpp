@@ -7,10 +7,11 @@
 
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
 // how it affects DX/Vulkan API interactions
-// TODO: Handle resizing (WM_SIZE?)
 // TODO: hook into imgui window management
 // TODO: add logger support to notify about window creation and possible failures
 // TODO: add window tests? Not sure how they'd actually look
+// TODO: Alert window clients when size and position change, since rendering surface would be
+// affected. This would have to happen every frame.
 
 namespace rsbl
 {
@@ -73,10 +74,38 @@ long long Window::WindowProc(void* handle,
     switch (uMsg)
     {
     case WM_SIZE:
-        // Window has been resized
-        // lParam contains LOWORD = new width, HIWORD = new height
-        // We acknowledge the event but don't update m_width/m_height here
-        // The application can query the actual size as needed
+        // Window has been resized - update the client area size
+        if (window != nullptr)
+        {
+            RECT client_rect;
+            if (GetClientRect(hwnd, &client_rect))
+            {
+                window->m_size.x = static_cast<uint32>(client_rect.right - client_rect.left);
+                window->m_size.y = static_cast<uint32>(client_rect.bottom - client_rect.top);
+            }
+        }
+        return 0;
+
+    case WM_WINDOWPOSCHANGED:
+        // Window position or size has changed
+        if (window != nullptr)
+        {
+            // Update position from window rect (screen coordinates)
+            RECT window_rect;
+            if (GetWindowRect(hwnd, &window_rect))
+            {
+                window->m_position.x = window_rect.left;
+                window->m_position.y = window_rect.top;
+            }
+
+            // Update size from client rect (what we actually care about for rendering)
+            RECT client_rect;
+            if (GetClientRect(hwnd, &client_rect))
+            {
+                window->m_size.x = static_cast<uint32>(client_rect.right - client_rect.left);
+                window->m_size.y = static_cast<uint32>(client_rect.bottom - client_rect.top);
+            }
+        }
         return 0;
 
     case WM_DESTROY:
