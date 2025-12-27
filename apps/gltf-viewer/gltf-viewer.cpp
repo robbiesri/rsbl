@@ -1,6 +1,7 @@
 // Copyright 2025 Robert Srinivasiah
 // Licensed under the MIT License, see the LICENSE file for more info
 
+#include <rsbl-ptr.h>
 #include <rsbl-window.h>
 
 #include <CLI11.hpp>
@@ -173,12 +174,12 @@ int main(int argc, char** argv)
     print_gltf_stats(asset.get(), logger);
 
     LOG_INFO(logger, "Starting window...");
-    rsbl::Window* win = nullptr;
+    rsbl::UniquePtr<rsbl::Window> win;
     auto window_create_result = rsbl::Window::Create(640, 480);
     if (window_create_result)
     {
         LOG_INFO(logger, "Window created successfully!");
-        win = window_create_result.Value();
+        win = rsblMove(rsbl::UniquePtr<rsbl::Window>(window_create_result.Value()));
     }
     else
     {
@@ -187,8 +188,7 @@ int main(int argc, char** argv)
     }
 
     // TODO: Window event loop
-
-    delete win;
+    //      * Check resizes
 
     return 0;
 }
