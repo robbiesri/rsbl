@@ -4,6 +4,7 @@
 #pragma once
 
 #include <rsbl-math-types.h>
+#include <rsbl-ptr.h>
 #include <rsbl-result.h>
 
 // TODO: capture input state
@@ -26,7 +27,7 @@ class Window
 {
   public:
     // Factory method to create a window
-    static Result<Window*> Create(uint32 width, uint32 height, int32 x = -1, int32 y = -1);
+    static Result<UniquePtr<Window>> Create(uint2 size, int2 position = {-1, -1});
 
     // Destructor
     ~Window();
@@ -84,7 +85,7 @@ class Window
 
   protected:
     // Private constructor - use Create() factory method
-    Window(uint32 width, uint32 height, int32 x, int32 y);
+    Window(uint2 size, int2 position);
     uint2 m_size;
     int2 m_position;
 

@@ -117,7 +117,7 @@ long long Window::WindowProc(void* handle,
     }
 }
 
-Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
+Result<UniquePtr<Window>> Window::Create(uint2 size, int2 position)
 {
     // Ensure window class is registered
     if (auto register_result = RegisterWindowClass(); register_result.Code() != ResultCode::Success)
@@ -126,12 +126,12 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     }
 
     // If position is -1, use default positioning (CW_USEDEFAULT)
-    const int pos_x = (x == -1) ? CW_USEDEFAULT : x;
-    const int pos_y = (y == -1) ? CW_USEDEFAULT : y;
+    const int pos_x = (position.x == -1) ? CW_USEDEFAULT : position.x;
+    const int pos_y = (position.y == -1) ? CW_USEDEFAULT : position.y;
 
     // Adjust the window size to account for borders, title bar, etc.
     // We want 'width' and 'height' to represent the client area size
-    RECT client_to_window_rect = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
+    RECT client_to_window_rect = {0, 0, static_cast<LONG>(size.x), static_cast<LONG>(size.y)};
     const DWORD window_style = WS_OVERLAPPEDWINDOW;
     const DWORD window_ex_style = 0;
 
@@ -163,7 +163,7 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     }
 
     // Allocate and initialize the Window object
-    Window* window = new Window(width, height, x, y);
+    Window* window = new Window(size, position);
     window->m_platformData.platform_handle = hwnd;
 
     // Store the Window pointer in the window's user data for access in WindowProc
@@ -194,12 +194,12 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
 
     window->Show();
 
-    return window;
+    return UniquePtr(window);
 }
 
-Window::Window(uint32 width, uint32 height, int32 x, int32 y)
-    : m_size(width, height)
-    , m_position(x, y)
+Window::Window(uint2 size, int2 position)
+    : m_size(size)
+    , m_position(position)
     , m_platformData{nullptr}
 {
 }

@@ -175,11 +175,11 @@ int main(int argc, char** argv)
 
     LOG_INFO(logger, "Starting window...");
     rsbl::UniquePtr<rsbl::Window> win;
-    auto window_create_result = rsbl::Window::Create(640, 480);
+    auto window_create_result = rsbl::Window::Create({640, 480});
     if (window_create_result)
     {
         LOG_INFO(logger, "Window created successfully!");
-        win = rsblMove(rsbl::UniquePtr<rsbl::Window>(window_create_result.Value()));
+        win = rsblMove(window_create_result.Value());
     }
     else
     {
