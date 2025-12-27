@@ -12,7 +12,7 @@
 // TODO: use AdjustWindowRect to correct rect based on position, size and actual display properties
 // TODO: Handle resizing (WM_SIZE?)
 // TODO: hook into imgui window management
-// TODO: do I really need the hbrBackground? When we are doing rendering?
+// TODO: Query and update actual window position + size from API
 
 namespace rsbl
 {
@@ -43,6 +43,7 @@ static Result<> RegisterWindowClass()
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     // lol, converting from color types to HBRUSH, we need to offset by 1. Insanity
     // See: https://www.gamedev.net/forums/topic/440835-what-is-color_window/?page=2
+    // I could remove this, but I'll keep it to fill in the 'dead' area on expanding resize
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = WINDOW_CLASS_NAME;

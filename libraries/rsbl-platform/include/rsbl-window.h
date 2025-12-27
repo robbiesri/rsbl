@@ -11,6 +11,7 @@
 // TODO: Cursor management?
 // TODO: Explicit message pumping?
 // TODO: vector types like uint2
+// TODO: handle fullscreen, esp relevant for mobile
 
 namespace rsbl
 {
