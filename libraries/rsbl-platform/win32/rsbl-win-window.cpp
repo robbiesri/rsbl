@@ -9,7 +9,6 @@
 // TODO: Set a pointer to the window impl class via SetWindowLongPtrA
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
 // how it affects DX/Vulkan API interactions
-// TODO: use AdjustWindowRect to correct rect based on position, size and actual display properties
 // TODO: Handle resizing (WM_SIZE?)
 // TODO: hook into imgui window management
 
@@ -86,15 +85,29 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     const int pos_x = (x == -1) ? CW_USEDEFAULT : x;
     const int pos_y = (y == -1) ? CW_USEDEFAULT : y;
 
+    // Adjust the window size to account for borders, title bar, etc.
+    // We want 'width' and 'height' to represent the client area size
+    RECT client_to_window_rect = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
+    const DWORD window_style = WS_OVERLAPPEDWINDOW;
+    const DWORD window_ex_style = 0;
+
+    if (!AdjustWindowRectEx(&client_to_window_rect, window_style, FALSE, window_ex_style))
+    {
+        return "Failed to adjust window rectangle";
+    }
+
+    const int adjusted_width = client_to_window_rect.right - client_to_window_rect.left;
+    const int adjusted_height = client_to_window_rect.bottom - client_to_window_rect.top;
+
     // Create the window (initially hidden)
-    const HWND hwnd = CreateWindowExA(0,                        // Extended window style
+    const HWND hwnd = CreateWindowExA(window_ex_style,          // Extended window style
                                       WINDOW_CLASS_NAME,        // Window class name
                                       "RSBL Window",            // Window title
-                                      WS_OVERLAPPEDWINDOW,      // Window style
+                                      window_style,             // Window style
                                       pos_x,                    // X position
                                       pos_y,                    // Y position
-                                      static_cast<int>(width),  // Width
-                                      static_cast<int>(height), // Height
+                                      adjusted_width,           // Width
+                                      adjusted_height,          // Height
                                       nullptr,                  // Parent window
                                       nullptr,                  // Menu
                                       GetModuleHandle(nullptr), // Instance
@@ -109,18 +122,26 @@ Result<Window*> Window::Create(uint32 width, uint32 height, int32 x, int32 y)
     Window* window = new Window(width, height, x, y);
     window->m_platformData.platform_handle = hwnd;
 
-    // Query the actual window position and size from Windows
-    RECT window_rect;
-    if (GetWindowRect(hwnd, &window_rect))
+    // Query the actual window position and size from Windows, but retain the expected 'client' area
+    RECT created_window_rect;
+    if (GetWindowRect(hwnd, &created_window_rect))
     {
-        window->m_x = window_rect.left;
-        window->m_y = window_rect.top;
-        window->m_width = static_cast<uint32>(window_rect.right - window_rect.left);
-        window->m_height = static_cast<uint32>(window_rect.bottom - window_rect.top);
+        window->m_x = created_window_rect.left;
+        window->m_y = created_window_rect.top;
     }
     else
     {
-        // TODO: log warning? We can't do much, but failing GetWinowRect sems bad.
+        // TODO: log warning? We can't do much, but failing GetWindowRect sems bad.
+    }
+
+    // Now get the correct width + height for the _client_ area of the window, which is what we
+    // care about for the renderer
+    RECT created_client_rect;
+    if (GetClientRect(hwnd, &created_client_rect))
+    {
+        window->m_width = static_cast<uint32>(created_client_rect.right - created_client_rect.left);
+        window->m_height =
+            static_cast<uint32>(created_client_rect.bottom - created_client_rect.top);
     }
 
     window->Show();

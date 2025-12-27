@@ -12,6 +12,7 @@
 // TODO: Explicit message pumping?
 // TODO: vector types like uint2
 // TODO: handle fullscreen, esp relevant for mobile
+// TODO: Surface the window and client regions thru Window API?
 
 namespace rsbl
 {
