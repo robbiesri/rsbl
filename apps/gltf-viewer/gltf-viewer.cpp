@@ -192,6 +192,10 @@ int main(int argc, char** argv)
         // do stuff?
 
         // TODO: check resize
+        if (window->CheckResize())
+        {
+            LOG_INFO(logger, "Resized window caught by app!");
+        }
     }
 
     return 0;

@@ -7,11 +7,7 @@
 
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
 // how it affects DX/Vulkan API interactions
-// TODO: hook into imgui window management
 // TODO: add logger support to notify about window creation and possible failures
-// TODO: add window tests? Not sure how they'd actually look
-// TODO: Alert window clients when size and position change, since rendering surface would be
-// affected. This would have to happen every frame.
 
 namespace rsbl
 {
@@ -57,7 +53,8 @@ static Result<> RegisterWindowClass()
 // We can expect WM_CLOSE -> WM_DESTROY -> WM_QUIT. Some of it is explained here:
 // https://stackoverflow.com/questions/3155782/what-is-the-difference-between-wm-quit-wm-close-and-wm-destroy-in-a-windows-pr
 // I'm just going to handle DESTROY, and let windows handle CLOSE and QUIT (though I'm kinda
-// invoking QUIT by caling PostQuitMessage).
+// invoking QUIT by calling PostQuitMessage).
+// Update: I'm actually posting quit, and then catching it in my message processing loop!
 long long Window::WindowProc(void* handle,
                              unsigned int uMsg,
                              unsigned long long wParam,
@@ -70,6 +67,21 @@ long long Window::WindowProc(void* handle,
     // Before we call SetWindowLongPtrA, this will be nullptr. So make we check if window is valid
     // first!
     auto* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
+    const uint2 cached_size = (window != nullptr) ? window->m_size : uint2(0, 0);
+
+    auto UpdateClientSize = [window, hwnd, cached_size]() {
+        RECT client_rect;
+        if (GetClientRect(hwnd, &client_rect))
+        {
+            window->m_size.x = static_cast<uint32>(client_rect.right - client_rect.left);
+            window->m_size.y = static_cast<uint32>(client_rect.bottom - client_rect.top);
+
+            if (cached_size.x != window->m_size.x || cached_size.y != window->m_size.y)
+            {
+                window->m_resizeFlagged = true;
+            }
+        }
+    };
 
     switch (uMsg)
     {
@@ -77,12 +89,7 @@ long long Window::WindowProc(void* handle,
         // Window has been resized - update the client area size
         if (window != nullptr)
         {
-            RECT client_rect;
-            if (GetClientRect(hwnd, &client_rect))
-            {
-                window->m_size.x = static_cast<uint32>(client_rect.right - client_rect.left);
-                window->m_size.y = static_cast<uint32>(client_rect.bottom - client_rect.top);
-            }
+            UpdateClientSize();
         }
         return 0;
 
@@ -99,12 +106,7 @@ long long Window::WindowProc(void* handle,
             }
 
             // Update size from client rect (what we actually care about for rendering)
-            RECT client_rect;
-            if (GetClientRect(hwnd, &client_rect))
-            {
-                window->m_size.x = static_cast<uint32>(client_rect.right - client_rect.left);
-                window->m_size.y = static_cast<uint32>(client_rect.bottom - client_rect.top);
-            }
+            UpdateClientSize();
         }
         return 0;
 

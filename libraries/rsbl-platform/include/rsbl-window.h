@@ -12,6 +12,8 @@
 // TODO: Cursor management?
 // TODO: handle fullscreen, esp relevant for mobile
 // TODO: Surface the window and client regions thru Window API?
+// TODO: add window tests? Not sure how they'd actually look
+// TODO: hook into imgui window management
 
 namespace rsbl
 {
@@ -19,8 +21,8 @@ namespace rsbl
 // Result of processing window messages
 enum class WindowMessageResult
 {
-    Continue,  // Continue running, no quit message
-    Quit,      // Quit message received
+    Continue, // Continue running, no quit message
+    Quit,     // Quit message received
 };
 
 // Opaque handle to platform-specific window data
@@ -81,6 +83,13 @@ class Window
         return m_position;
     }
 
+    bool CheckResize()
+    {
+        const bool state = m_resizeFlagged;
+        m_resizeFlagged = false;
+        return state;
+    }
+
     // Unfortunate to leak some platform-specific bits into header, but this is simpler than doing
     // some PIMPL thing
 #ifdef _WIN32
@@ -97,6 +106,8 @@ class Window
     Window(uint2 size, int2 position);
     uint2 m_size;
     int2 m_position;
+
+    bool m_resizeFlagged = false;
 
     // Platform-specific implementation data
     WindowNativeData m_platformData;
