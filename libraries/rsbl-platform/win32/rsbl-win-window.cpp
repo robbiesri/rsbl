@@ -248,4 +248,28 @@ bool Window::IsVisible() const
     return false;
 }
 
+WindowMessageResult Window::ProcessMessages()
+{
+    MSG msg;
+
+    // Process all pending messages (non-blocking with PM_REMOVE)
+    // NOTE: Shouldn't we be passing in our hwnd in?
+    while (::PeekMessageA(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        // Check if it's a quit message
+        if (msg.message == WM_QUIT)
+        {
+            return WindowMessageResult::Quit;
+        }
+
+        // Translate virtual-key messages into character messages
+        ::TranslateMessage(&msg);
+
+        // Dispatch message to WindowProc
+        ::DispatchMessageA(&msg);
+    }
+
+    return WindowMessageResult::Continue;
+}
+
 } // namespace rsbl

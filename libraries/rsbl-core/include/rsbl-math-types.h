@@ -7,6 +7,8 @@
 
 // TODO: constructors that take in fixed size arrays
 // TODO: interop with DirectXMath types
+// TODO: float + double vector types
+// TODO: support for SIMD? probably separate types
 
 namespace rsbl
 {

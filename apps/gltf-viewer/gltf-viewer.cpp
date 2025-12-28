@@ -174,12 +174,12 @@ int main(int argc, char** argv)
     print_gltf_stats(asset.get(), logger);
 
     LOG_INFO(logger, "Starting window...");
-    rsbl::UniquePtr<rsbl::Window> win;
+    rsbl::UniquePtr<rsbl::Window> window;
     auto window_create_result = rsbl::Window::Create({640, 480});
     if (window_create_result)
     {
         LOG_INFO(logger, "Window created successfully!");
-        win = rsblMove(window_create_result.Value());
+        window = rsblMove(window_create_result.Value());
     }
     else
     {
@@ -187,8 +187,12 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // TODO: Window event loop
-    //      * Check resizes
+    while (window->ProcessMessages() != rsbl::WindowMessageResult::Quit)
+    {
+        // do stuff?
+
+        // TODO: check resize
+    }
 
     return 0;
 }

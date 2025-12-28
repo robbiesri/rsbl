@@ -10,12 +10,18 @@
 // TODO: capture input state
 // TODO: Handle Window callback (for imgui stuff)
 // TODO: Cursor management?
-// TODO: Explicit message pumping?
 // TODO: handle fullscreen, esp relevant for mobile
 // TODO: Surface the window and client regions thru Window API?
 
 namespace rsbl
 {
+
+// Result of processing window messages
+enum class WindowMessageResult
+{
+    Continue,  // Continue running, no quit message
+    Quit,      // Quit message received
+};
 
 // Opaque handle to platform-specific window data
 struct WindowNativeData
@@ -44,6 +50,9 @@ class Window
     void Show();
     void Hide();
     bool IsVisible() const;
+
+    // Process pending OS messages (non-blocking)
+    WindowMessageResult ProcessMessages();
 
     // Dimension and position accessors
     uint32 Width() const
