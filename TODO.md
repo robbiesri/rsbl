@@ -9,11 +9,11 @@
 [x] Result API for error handling
 [x] Assert implementation
 [x] Window management system for platform
-[ ] Barebones smart pointers
+[x] Barebones smart pointers
+[ ] Add IMGUI to window to give controls
 [ ] Create render library
 [ ] Set up support for DX12 and Vulkan
 [ ] Create simple app that loads GLTF, and renders in real time
-[ ] Add IMGUI to window to give controls
 [ ] asset manager
 
 ## Infrastructure
@@ -41,3 +41,15 @@
 
 [ ] CPU parallel job system, similar to PS3 cell system
 [ ] Task graph system?
+
+## Thread Management
+
+## Functions
+
+[ ] Simpler alternative to std::function
+[ ] Configurable compile-time size specification for internal storage
+[ ] Supports functions, lambdas, and instance methods
+[ ] Move only, no copies
+[ ] Minimal includes
+[ ] Bind support not needed initially
+[ ] Easy to debug
