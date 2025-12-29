@@ -13,7 +13,7 @@ namespace rsbl
 {
 
 // Window class name for registration
-static const char* WINDOW_CLASS_NAME = "RSBLWindowClass";
+static const char* s_windowClassName = "RSBLWindowClass";
 static bool s_windowClassRegistered = false;
 
 // Register the window class (only needs to happen once)
@@ -38,7 +38,7 @@ static Result<> RegisterWindowClass()
     // I could remove this, but I'll keep it to fill in the 'dead' area on expanding resize
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszMenuName = nullptr;
-    wc.lpszClassName = WINDOW_CLASS_NAME;
+    wc.lpszClassName = s_windowClassName;
     wc.hIconSm = nullptr;
 
     if (!RegisterClassExA(&wc))
@@ -127,7 +127,7 @@ Result<UniquePtr<Window>> Window::Create(uint2 size, int2 position)
         return "Failed to register window class";
     }
 
-    // If position is -1, use default positioning (CW_USEDEFAULT)
+    // If position is -1, use default positioning
     const int pos_x = (position.x == -1) ? CW_USEDEFAULT : position.x;
     const int pos_y = (position.y == -1) ? CW_USEDEFAULT : position.y;
 
@@ -147,7 +147,7 @@ Result<UniquePtr<Window>> Window::Create(uint2 size, int2 position)
 
     // Create the window (initially hidden)
     const HWND hwnd = CreateWindowExA(window_ex_style,          // Extended window style
-                                      WINDOW_CLASS_NAME,        // Window class name
+                                      s_windowClassName,        // Window class name
                                       "RSBL Window",            // Window title
                                       window_style,             // Window style
                                       pos_x,                    // X position
