@@ -51,3 +51,9 @@ rsbl_add_test(
         SOURCES rsbl-ptr.test.cpp
         LIBRARIES rsbl-core
 )
+
+rsbl_add_test(
+        NAME rsbl-function-test
+        SOURCES rsbl-function.test.cpp
+        LIBRARIES rsbl-core
+)
