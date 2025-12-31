@@ -139,7 +139,7 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
     DestructorType m_destructor = nullptr;
 };
 
-template <typename ClassType, typename MemberFunc>
+template <auto MemberFunc>
 struct MemberFuncWrapper;
 
 // Non-const member function
@@ -147,7 +147,7 @@ template <typename ClassType,
           typename ReturnType,
           typename... ArgsTypes,
           ReturnType (ClassType::*MemberFunc)(ArgsTypes...)>
-struct MemberFuncWrapper<ClassType, ReturnType (ClassType::*)(ArgsTypes...)>
+struct MemberFuncWrapper<MemberFunc>
 {
     ClassType* object;
 
@@ -162,7 +162,7 @@ template <typename ClassType,
           typename ReturnType,
           typename... ArgsTypes,
           ReturnType (ClassType::*ConstMemberFunc)(ArgsTypes...) const>
-struct MemberFuncWrapper<ClassType, ReturnType (ClassType::*)(ArgsTypes...) const>
+struct MemberFuncWrapper<ConstMemberFunc>
 {
     const ClassType* object;
 
@@ -175,8 +175,7 @@ struct MemberFuncWrapper<ClassType, ReturnType (ClassType::*)(ArgsTypes...) cons
 template <auto MemberFunc, typename ClassType>
 auto BindMember(ClassType* obj)
 {
-    using FuncType = decltype(MemberFunc);
-    return MemberFuncWrapper<ClassType, FuncType>{obj};
+    return MemberFuncWrapper<MemberFunc>{obj};
 }
 
 } // namespace rsbl
