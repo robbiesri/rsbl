@@ -48,8 +48,9 @@
 
 [ ] Simpler alternative to std::function
 [ ] Configurable compile-time size specification for internal storage
-[ ] Supports functions, lambdas, and instance methods
+[ ] Supports free functions, lambdas, and instance methods
 [ ] Move only, no copies
 [ ] Minimal includes
 [ ] Bind support not needed initially
 [ ] Easy to debug
+[ ] No STL except placement new (and internal move + forward)
