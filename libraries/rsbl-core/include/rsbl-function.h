@@ -23,10 +23,10 @@ namespace rsbl
 // Interestingly, I am allowed to have the parameter pack as NOT last, because default arguments can
 // be last. I might change this because...it's weird. But default template arg followed by parameter
 // pack is also kinda weird
-template <typename ReturnType, typename... ArgsTypes, uint32 BufferSize = 32>
+template <typename ReturnType, uint32 BufferSize = 32, typename... ArgsTypes>
 class Function;
 
-template <typename ReturnType, typename... ArgsTypes, uint32 BufferSize>
+template <typename ReturnType, uint32 BufferSize, typename... ArgsTypes>
 class Function<ReturnType(ArgsTypes...), BufferSize>
 {
   public:
