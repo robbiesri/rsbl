@@ -28,38 +28,13 @@ target_include_directories(rsbl-core
 )
 
 # Tests
-rsbl_add_test(
-        NAME rsbl-result-test
-        SOURCES rsbl-result.test.cpp
-        LIBRARIES rsbl-core
-)
-
-rsbl_add_test(
-        NAME rsbl-dynamic-array-test
-        SOURCES rsbl-dynamic-array.test.cpp
-        LIBRARIES rsbl-core
-)
-
-rsbl_add_test(
-        NAME rsbl-math-test
-        SOURCES rsbl-math.test.cpp
-        LIBRARIES rsbl-core
-)
-
-rsbl_add_test(
-        NAME rsbl-ptr-test
-        SOURCES rsbl-ptr.test.cpp
-        LIBRARIES rsbl-core
-)
-
-rsbl_add_test(
-        NAME rsbl-function-test
-        SOURCES rsbl-function.test.cpp
-        LIBRARIES rsbl-core
-)
-
-rsbl_add_test(
-        NAME rsbl-ref-test
-        SOURCES rsbl-ref.test.cpp
+rsbl_add_tests(
+        SOURCES
+        rsbl-result.test.cpp
+        rsbl-dynamic-array.test.cpp
+        rsbl-math.test.cpp
+        rsbl-ptr.test.cpp
+        rsbl-function.test.cpp
+        rsbl-ref.test.cpp
         LIBRARIES rsbl-core
 )
