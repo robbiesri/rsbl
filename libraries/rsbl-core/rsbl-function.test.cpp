@@ -6,7 +6,11 @@
 
 #include "include/rsbl-function.h"
 
+#include <cstddef>
+
 using namespace rsbl;
+
+static_assert(alignof(std::max_align_t) <= rsbl::kFunctionBufferAlignment);
 
 // Test helper struct with tracking capabilities
 struct FunctorTracker
@@ -95,7 +99,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Construction with lambda")
     {
-        auto lambda = [](int x) { return x * 2; };
+        auto lambda = [](int x) {
+            return x * 2;
+        };
         Function<int(int)> func(lambda);
 
         CHECK(func.Valid());
@@ -107,7 +113,9 @@ TEST_SUITE("rsbl::Function")
     TEST_CASE("Construction with capturing lambda")
     {
         int multiplier = 3;
-        auto lambda = [multiplier](int x) { return x * multiplier; };
+        auto lambda = [multiplier](int x) {
+            return x * multiplier;
+        };
         Function<int(int)> func(lambda);
 
         CHECK(func.Valid());
@@ -131,7 +139,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Invoke with different argument types (type conversion)")
     {
-        auto lambda = [](int x) { return x * 2; };
+        auto lambda = [](int x) {
+            return x * 2;
+        };
         Function<int(int)> func(lambda);
 
         // Should work with implicit conversion from short to int
@@ -146,7 +156,9 @@ TEST_SUITE("rsbl::Function")
     TEST_CASE("Function returning void")
     {
         int called = 0;
-        auto lambda = [&called]() { called++; };
+        auto lambda = [&called]() {
+            called++;
+        };
         Function<void()> func(lambda);
 
         CHECK(func.Valid());
@@ -158,7 +170,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Function with no arguments")
     {
-        auto lambda = []() { return 42; };
+        auto lambda = []() {
+            return 42;
+        };
         Function<int()> func(lambda);
 
         CHECK(func() == 42);
@@ -166,7 +180,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Function with multiple arguments")
     {
-        auto lambda = [](int a, int b, int c) { return a + b + c; };
+        auto lambda = [](int a, int b, int c) {
+            return a + b + c;
+        };
         Function<int(int, int, int)> func(lambda);
 
         CHECK(func(1, 2, 3) == 6);
@@ -175,7 +191,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Move constructor")
     {
-        auto lambda = [](int x) { return x * 2; };
+        auto lambda = [](int x) {
+            return x * 2;
+        };
         Function<int(int)> func1(lambda);
         Function<int(int)> func2(rsblMove(func1));
 
@@ -186,8 +204,12 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Move assignment")
     {
-        auto lambda1 = [](int x) { return x * 2; };
-        auto lambda2 = [](int x) { return x + 100; };
+        auto lambda1 = [](int x) {
+            return x * 2;
+        };
+        auto lambda2 = [](int x) {
+            return x + 100;
+        };
 
         Function<int(int)> func1(lambda1);
         Function<int(int)> func2(lambda2);
@@ -204,7 +226,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Move assignment from empty function")
     {
-        auto lambda = [](int x) { return x * 2; };
+        auto lambda = [](int x) {
+            return x * 2;
+        };
         Function<int(int)> func1;
         Function<int(int)> func2(lambda);
 
@@ -218,7 +242,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Move assignment to empty function")
     {
-        auto lambda = [](int x) { return x * 2; };
+        auto lambda = [](int x) {
+            return x * 2;
+        };
         Function<int(int)> func1(lambda);
         Function<int(int)> func2;
 
@@ -231,7 +257,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Self-move assignment")
     {
-        auto lambda = [](int x) { return x * 2; };
+        auto lambda = [](int x) {
+            return x * 2;
+        };
         Function<int(int)> func(lambda);
 
         auto& ref = func;
@@ -332,7 +360,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Custom buffer size - small buffer")
     {
-        auto lambda = [](int x) { return x + 1; };
+        auto lambda = [](int x) {
+            return x + 1;
+        };
         Function<int(int), 16> func(lambda);
 
         CHECK(func.Valid());
@@ -343,7 +373,9 @@ TEST_SUITE("rsbl::Function")
     {
         // Create a lambda with lots of captures to test larger buffer
         int a = 1, b = 2, c = 3, d = 4;
-        auto lambda = [a, b, c, d](int x) { return x + a + b + c + d; };
+        auto lambda = [a, b, c, d](int x) {
+            return x + a + b + c + d;
+        };
 
         Function<int(int), 64> func(lambda);
 
@@ -354,7 +386,9 @@ TEST_SUITE("rsbl::Function")
     TEST_CASE("Function with pointer return type")
     {
         static int value = 42;
-        auto lambda = []() -> int* { return &value; };
+        auto lambda = []() -> int* {
+            return &value;
+        };
         Function<int*()> func(lambda);
 
         int* result = func();
@@ -364,7 +398,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Function with reference parameter")
     {
-        auto lambda = [](int& x) { x *= 2; };
+        auto lambda = [](int& x) {
+            x *= 2;
+        };
         Function<void(int&)> func(lambda);
 
         int value = 10;
@@ -374,7 +410,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Function with const reference parameter")
     {
-        auto lambda = [](const int& x) { return x * 2; };
+        auto lambda = [](const int& x) {
+            return x * 2;
+        };
         Function<int(const int&)> func(lambda);
 
         int value = 15;
@@ -383,9 +421,15 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Chained move assignments")
     {
-        auto lambda1 = [](int x) { return x * 2; };
-        auto lambda2 = [](int x) { return x + 10; };
-        auto lambda3 = [](int x) { return x - 5; };
+        auto lambda1 = [](int x) {
+            return x * 2;
+        };
+        auto lambda2 = [](int x) {
+            return x + 10;
+        };
+        auto lambda3 = [](int x) {
+            return x - 5;
+        };
 
         Function<int(int)> f1(lambda1);
         Function<int(int)> f2(lambda2);
@@ -417,8 +461,12 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Multiple Functions with same functor type")
     {
-        auto lambda1 = [](int x) { return x * 2; };
-        auto lambda2 = [](int x) { return x * 3; };
+        auto lambda1 = [](int x) {
+            return x * 2;
+        };
+        auto lambda2 = [](int x) {
+            return x * 3;
+        };
 
         Function<int(int)> func1(lambda1);
         Function<int(int)> func2(lambda2);
@@ -429,7 +477,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Function with bool return type")
     {
-        auto lambda = [](int x) { return x > 10; };
+        auto lambda = [](int x) {
+            return x > 10;
+        };
         Function<bool(int)> func(lambda);
 
         CHECK(func(15) == true);
@@ -441,7 +491,9 @@ TEST_SUITE("rsbl::Function")
         Function<int(int)> func;
         CHECK_FALSE(func.Valid());
 
-        auto lambda = [](int x) { return x + 1; };
+        auto lambda = [](int x) {
+            return x + 1;
+        };
         func = Function<int(int)>(lambda);
 
         CHECK(func.Valid());
@@ -450,7 +502,9 @@ TEST_SUITE("rsbl::Function")
 
     TEST_CASE("Valid function becomes invalid after move")
     {
-        auto lambda = [](int x) { return x + 1; };
+        auto lambda = [](int x) {
+            return x + 1;
+        };
         Function<int(int)> func1(lambda);
         CHECK(func1.Valid());
 

@@ -9,7 +9,6 @@
 
 // TODO: Method binder helper in lambda form
 // TODO: Method version of Function constructor
-// TODO: analog to std::max_align_t, perhaps __STDCPP_DEFAULT_NEW_ALIGNMENT__ ?
 // TODO: static_assert that storage alignment doesn't conflict with functor alignmenet
 // TODO: support 'emplacing' into existing Function? I don't think I care
 // TODO: Interest in using std::construct_at instead of placement new?
@@ -17,7 +16,10 @@
 namespace rsbl
 {
 
-// I' not entirely sure why I need this forward declaration, but I see this pattern all the time...
+// clang and gcc return 16 for alignof(std::max_align_t). msvc returns 8. Let's just use 16.
+constexpr uint32 kFunctionBufferAlignment = 16;
+
+// I'm not entirely sure why I need this forward declaration, but I see this pattern all the time...
 // I guess it's because we can't clarify the 'order' of ReturnType and ArgsTypes without the
 // specialization that shows the function signature
 // Interestingly, I am allowed to have the parameter pack as NOT last, because default arguments can
@@ -42,6 +44,8 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
     {
         using StoredType = Decay<FunctorType>;
         static_assert(sizeof(StoredType) <= BufferSize, "Functor too large for Function buffer");
+        static_assert(alignof(StoredType) <= kFunctionBufferAlignment,
+                      "Functor alignment too strict for Function");
 
         m_invoker = [](void* functor_buffer, ArgsTypes... args) -> ReturnType {
             return (*static_cast<StoredType*>(functor_buffer))(rsblForward(args)...);
@@ -136,7 +140,7 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
     }
 
     // I think better to have the buffer first
-    alignas(8) uint8 m_buffer[BufferSize]{};
+    alignas(kFunctionBufferAlignment) uint8 m_buffer[BufferSize]{};
 
     // I could just declare these are regular function pointers, but I think the using syntax
     // makes the member decls easier to read
