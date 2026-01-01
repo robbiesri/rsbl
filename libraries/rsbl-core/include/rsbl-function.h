@@ -40,22 +40,23 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
     template <typename FunctorType>
     Function(FunctorType&& functor)
     {
-        static_assert(sizeof(FunctorType) <= BufferSize, "Functor too large for Function buffer");
+        using StoredType = Decay<FunctorType>;
+        static_assert(sizeof(StoredType) <= BufferSize, "Functor too large for Function buffer");
 
         m_invoker = [](void* functor_buffer, ArgsTypes... args) -> ReturnType {
-            return (*static_cast<FunctorType*>(functor_buffer))(args...);
+            return (*static_cast<StoredType*>(functor_buffer))(args...);
         };
 
         m_destructor = [](void* functor_buffer) {
-            static_cast<FunctorType*>(functor_buffer)->~FunctorType();
+            static_cast<StoredType*>(functor_buffer)->~StoredType();
         };
 
         m_mover = [](void* dst, void* src) {
-            new (dst) FunctorType(rsblMove(*static_cast<FunctorType*>(src)));
+            new (dst) StoredType(rsblMove(*static_cast<StoredType*>(src)));
         };
 
         // I need to use placement new to manage the functor construction correctly
-        new (m_buffer) FunctorType(rsblForward(functor));
+        new (m_buffer) StoredType(rsblForward(functor));
     }
 
     // Type for CallArguments is explicitly different from ArgsTypes to support conversion
