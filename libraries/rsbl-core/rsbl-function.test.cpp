@@ -237,8 +237,9 @@ TEST_SUITE("rsbl::Function")
         auto& ref = func;
         func = rsblMove(ref);
 
-        // After self-move, function should be reset
-        CHECK_FALSE(func.Valid());
+        // Self-move is protected by the (this != &rhs) check, so function remains valid
+        CHECK(func.Valid());
+        CHECK(func(5) == 10);
     }
 
     TEST_CASE("Destructor calls functor destructor")
