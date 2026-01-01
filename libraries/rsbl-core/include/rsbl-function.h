@@ -7,12 +7,13 @@
 #include "rsbl-core.h"
 #include "rsbl-int-types.h"
 
-// TODO: Method binder helper function
-// TODO: Interest in using std::construct_at instead of placement new?
+// TODO: Method binder helper in lambda form
 // TODO: Method version of Function constructor
 // TODO: analog to std::max_align_t, perhaps __STDCPP_DEFAULT_NEW_ALIGNMENT__ ?
-// TODO: do I need to forward the args inside m_invoker lambda?
+// TODO: static_assert that storage alignment doesn't conflict with functor alignmenet
+// TODO: do I need to forward the args inside m_invoker lambda? What about perfect forward?
 // TODO: support 'emplacing' into existing Function? I don't think I care
+// TODO: Interest in using std::construct_at instead of placement new?
 
 namespace rsbl
 {
@@ -59,13 +60,21 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
         new (m_buffer) StoredType(rsblForward(functor));
     }
 
-    // Type for CallArguments is explicitly different from ArgsTypes to support conversion
-    // of argument types. We can't use perfect forwarding in this case.
-    template <typename... CallArguments>
-    ReturnType operator()(CallArguments... call_args) const
+    // Type for CallArgsTypes is explicitly different from ArgsTypes to support conversion
+    // of argument types. We do use perfect forwarding here in order to preserve reference args.
+    // Having different types here allows for some reasonable implicit conversions.
+    // The alternative (which is much more typical) is to NOT have this operator templated, and just
+    // use ArgsTypes for the call_args parameter pack. I'm actually slightly surprised the
+    // forwarding works for CallArgsTypes. m_invoker must be doing the correct deduction!
+    // Something else I might have to consider is marking reference args with rsbl::Ref (or
+    // something similar to std::ref).
+
+    template <typename... CallArgsTypes>
+    ReturnType operator()(CallArgsTypes&&... call_args) const
     {
         rsblAssert(m_invoker != nullptr);
-        return m_invoker(const_cast<void*>(static_cast<const void*>(m_buffer)), call_args...);
+        return m_invoker(const_cast<void*>(static_cast<const void*>(m_buffer)),
+                         rsblForward(call_args)...);
     }
 
     // No copies

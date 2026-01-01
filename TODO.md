@@ -54,3 +54,4 @@
 [ ] Bind support not needed initially
 [ ] Easy to debug
 [ ] No STL except placement new (and internal move + forward)
+[ ] Allow implicit conversions in call operator (different parameter pack type vs function template)
