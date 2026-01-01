@@ -25,6 +25,7 @@
 [x] Put cmake, python, and ninja all into the same folder?
 [x] Command line options lib - CLI11
 [x] Use release zips instead of subtrees?
+[x] Function alternative to std::function
 [ ] Cache release zips on personal S3 bucket?
 
 ## Render Architecture
@@ -46,12 +47,12 @@
 
 ## Functions
 
-[ ] Simpler alternative to std::function
-[ ] Configurable compile-time size specification for internal storage
-[ ] Supports free functions, lambdas, and instance methods
-[ ] Move only, no copies
-[ ] Minimal includes
-[ ] Bind support not needed initially
-[ ] Easy to debug
-[ ] No STL except placement new (and internal move + forward)
-[ ] Allow implicit conversions in call operator (different parameter pack type vs function template)
+[x] Simpler alternative to std::function
+[x] Configurable compile-time size specification for internal storage
+[x] Supports free functions, lambdas, and instance methods
+[x] Move only, no copies
+[x] Minimal includes
+[x] Bind support not needed initially
+[x] Easy to debug
+[x] No STL except placement new (and internal move + forward)
+[x] Allow implicit conversions in call operator (different parameter pack type vs function template)
