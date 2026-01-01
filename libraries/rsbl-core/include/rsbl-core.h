@@ -22,12 +22,58 @@ namespace rsbl
         {
             using type = T;
         };
+
+        template <class T>
+        struct RemoveConst
+        {
+            using type = T;
+        };
+        template <class T>
+        struct RemoveConst<const T>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct RemoveVolatile
+        {
+            using type = T;
+        };
+        template <class T>
+        struct RemoveVolatile<volatile T>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct RemoveCV
+        {
+            using type = typename RemoveVolatile<typename RemoveConst<T>::type>::type;
+        };
+
+        template <class T>
+        struct Decay
+        {
+            using type = typename RemoveCV<typename RemoveReference<T>::type>::type;
+        };
     } // namespace Internal
 
     // Basically the same as std::remove_reference except we use the Internal namespace to demarcate
     // usage of RemoveReference. There's no reason to use the ::type manually.
     template <class T>
     using RemoveReference = typename Internal::RemoveReference<T>::type;
+
+    template <class T>
+    using RemoveConst = typename Internal::RemoveConst<T>::type;
+
+    template <class T>
+    using RemoveVolatile = typename Internal::RemoveVolatile<T>::type;
+
+    template <class T>
+    using RemoveCV = typename Internal::RemoveCV<T>::type;
+
+    template <class T>
+    using Decay = typename Internal::Decay<T>::type;
 
 } // namespace rsbl
 
