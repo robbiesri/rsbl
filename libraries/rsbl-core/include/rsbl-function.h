@@ -65,7 +65,7 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
     ReturnType operator()(CallArguments... call_args) const
     {
         rsblAssert(m_invoker != nullptr);
-        return m_invoker(const_cast<void*>(&m_buffer[0]), call_args...);
+        return m_invoker(const_cast<void*>(static_cast<const void*>(m_buffer)), call_args...);
     }
 
     // No copies
