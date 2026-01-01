@@ -70,7 +70,7 @@ I took a close look at the implementation and noticed a few interesting things
 The first pass implementation felt good, and it was easy to mentally wrap my head around. Still, there were critical
 issues, and the workflow didn't really handle the issues well inside the chat client.
 
-#### Claude Opus 4.5 (Web UI)
+#### Claude Opus 4.5 (Web UI) + Sonnet 4.5 (Code)
 
 The initial implementation looked quite good, after seeing the issues that GPT-5 had. The bones are totally there. The
 implementation is relatively easy to read. Seems like a definite improvement over Sonnet 4.5.
@@ -89,6 +89,34 @@ forwarding. I did not think that would work, but it did, and I didn't expect tha
 the argument reference types, but that's fine for now. I think it's not actually deducing. It's leaving deduction to
 `m_invoker`, which makes sense.
 
+#### Gemini 3 Pro (Web UI)
+
+Gemini did a good job building out what appeared to be a sufficient implementation, but it had some extraneous
+meta-programming that I didn't think was necessary. It implemented `is_same` and `enable_if` to check if we try to pass
+the function class into itself? Why...would I do that?
+
+I did see one issue, and learned something new!
+
+```c++
+alignas(void*) unsigned char storage_[Capacity];
+
+new (&storage_) DecayedF(std::forward<F>(f));
+```
+
+Initially, I thought that this wouldn't work because it's getting the address of `storage_`, which would be a pointer to
+a pointer. But it seems that `storage_` and `&storage_` and `&storage_[0]` work out to the same address! I did not
+realize that second usage does that, but it makes sense after some reading on StackOverflow. I pointed this out to
+Gemini, and Gemini agreed that it shouldn't use `&storage_` because it wasn't idiomatic.
+
+Gemini also included `<cstddef>`, but then decided on not using `alignas(std::max_align_t)` because it didn't want to
+depend on the header. But it already included the header!
+
+Gemini used a `VTable` implementation, and I liked how it worked for toggling all the internal functions on and off. I
+wasn't crazy about a pointer to a table of pointers. Not really sure why Gemini decided on two indirections for this.
+
+Overall, I was impressed with the implementation, even if I didn't love all the patterns used. It would have worked
+fine, but I am curious if I'd run into issues with that 'extra' code down the line.
+
 ---
 
 A couple takeaways from the process with LLMs
@@ -101,3 +129,7 @@ A couple takeaways from the process with LLMs
 * Each LLM liked the `typename Signature` pattern instead of `typename R, typename... Args` pattern for the template
   declaration. I also noticed each LLM used `F, R, Args` for the input function type, return type, and args parameter
   pack.
+
+I think I'll continue to use Claude Code because I like the UX, but I'm going to seriously investigate other agentic
+terminal tools, because I think I want to swap in Gemini for pricing reasons. I've seen people on Hacker News talk about
+using Claude Opus to plan, and Gemini to implement, and that makes a lot of sense to me after this test case.
