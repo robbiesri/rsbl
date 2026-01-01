@@ -11,7 +11,6 @@
 // TODO: Method version of Function constructor
 // TODO: analog to std::max_align_t, perhaps __STDCPP_DEFAULT_NEW_ALIGNMENT__ ?
 // TODO: static_assert that storage alignment doesn't conflict with functor alignmenet
-// TODO: do I need to forward the args inside m_invoker lambda? What about perfect forward?
 // TODO: support 'emplacing' into existing Function? I don't think I care
 // TODO: Interest in using std::construct_at instead of placement new?
 
@@ -45,7 +44,7 @@ class Function<ReturnType(ArgsTypes...), BufferSize>
         static_assert(sizeof(StoredType) <= BufferSize, "Functor too large for Function buffer");
 
         m_invoker = [](void* functor_buffer, ArgsTypes... args) -> ReturnType {
-            return (*static_cast<StoredType*>(functor_buffer))(args...);
+            return (*static_cast<StoredType*>(functor_buffer))(rsblForward(args)...);
         };
 
         m_destructor = [](void* functor_buffer) {
