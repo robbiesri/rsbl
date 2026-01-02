@@ -5,6 +5,7 @@
 
 #include <rsbl-function.h>
 #include <rsbl-int-types.h>
+#include <rsbl-ptr.h>
 #include <rsbl-result.h>
 
 #include <atomic>
@@ -29,14 +30,15 @@ class Thread
     // Factory method to create and start a thread with a function
     // The function will be executed on a new thread immediately
     // The function must return Result<> to report success/failure
-    static Result<Thread> Create(Function<Result<>()>&& thread_func);
+    // Returns a UniquePtr to keep the thread object at a fixed memory location
+    static Result<UniquePtr<Thread>> Create(Function<Result<>()>&& thread_func);
 
     // Destructor - will join if not already joined
     ~Thread();
 
-    // Moveable, not copyable
-    Thread(Thread&&) noexcept;
-    Thread& operator=(Thread&&) noexcept;
+    // Not moveable or copyable (thread is actively executing and accessing this object)
+    Thread(Thread&&) = delete;
+    Thread& operator=(Thread&&) = delete;
     Thread(const Thread&) = delete;
     Thread& operator=(const Thread&) = delete;
 

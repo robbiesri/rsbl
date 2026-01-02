@@ -49,6 +49,8 @@
 [ ] Simpler alternative to std::thread
 [ ] Minimal includes, avoid heavy STL headers
 [ ] Build on rsbl::Function, rsbl::Result and std::atomic
+[ ] Disallow moves and copies
+[ ] Static creation function that return `rsbl::UniquePtr<rsbl::Thread>`
 [ ] Support sleep + yield
 [ ] Method to query if the thread is still actively processing the client function
 [ ] Join method that can take optional timeout

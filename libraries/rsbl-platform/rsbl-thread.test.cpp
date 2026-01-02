@@ -26,20 +26,20 @@ TEST_SUITE("rsbl::Thread")
         auto thread = rsblMove(thread_result.Value());
 
         // Thread should be active initially
-        CHECK(thread.IsActive());
+        CHECK(thread->IsActive());
 
         // Join the thread
-        auto join_result = thread.Join();
+        auto join_result = thread->Join();
         CHECK(join_result);
 
         // Thread should no longer be active
-        CHECK_FALSE(thread.IsActive());
+        CHECK_FALSE(thread->IsActive());
 
         // Verify the thread executed
         CHECK(executed.load(std::memory_order_acquire));
 
         // Check the function result
-        const auto& func_result = thread.GetFunctionResult();
+        const auto& func_result = thread->GetFunctionResult();
         CHECK(func_result);
         CHECK(func_result.Code() == ResultCode::Success);
     }
@@ -53,16 +53,16 @@ TEST_SUITE("rsbl::Thread")
         REQUIRE(thread_result);
         auto thread = rsblMove(thread_result.Value());
 
-        auto join_result = thread.Join();
+        auto join_result = thread->Join();
         CHECK(join_result);
 
         // Check the function result shows failure
-        const auto& func_result = thread.GetFunctionResult();
+        const auto& func_result = thread->GetFunctionResult();
         CHECK_FALSE(func_result);
         CHECK(func_result.Code() == ResultCode::Failure);
 
         // Check we can retrieve the error text
-        const char* error_text = thread.GetResultText();
+        const char* error_text = thread->GetResultText();
         CHECK(error_text != nullptr);
         CHECK(std::string(error_text) == "Thread encountered an error");
     }
@@ -84,13 +84,13 @@ TEST_SUITE("rsbl::Thread")
         REQUIRE(thread_result);
         auto thread = rsblMove(thread_result.Value());
 
-        auto join_result = thread.Join();
+        auto join_result = thread->Join();
         CHECK(join_result);
 
         // Verify computation result (sum of 1..100 = 5050)
         CHECK(result.load(std::memory_order_acquire) == 5050);
 
-        const auto& func_result = thread.GetFunctionResult();
+        const auto& func_result = thread->GetFunctionResult();
         CHECK(func_result);
     }
 
@@ -108,19 +108,19 @@ TEST_SUITE("rsbl::Thread")
         auto thread = rsblMove(thread_result.Value());
 
         // Thread should be active
-        CHECK(thread.IsActive());
+        CHECK(thread->IsActive());
 
         // Wait a bit to ensure thread has started
         Thread::ThreadSleep(10);
         CHECK(started.load(std::memory_order_acquire));
 
         // Thread should still be active (sleeping)
-        CHECK(thread.IsActive());
+        CHECK(thread->IsActive());
 
         // Join and verify completion
-        auto join_result = thread.Join();
+        auto join_result = thread->Join();
         CHECK(join_result);
-        CHECK_FALSE(thread.IsActive());
+        CHECK_FALSE(thread->IsActive());
     }
 
     TEST_CASE("JoinTimeout with successful completion")
@@ -134,11 +134,11 @@ TEST_SUITE("rsbl::Thread")
         auto thread = rsblMove(thread_result.Value());
 
         // Join with a timeout longer than the sleep
-        auto join_result = thread.JoinTimeout(500); // 500ms timeout
+        auto join_result = thread->JoinTimeout(500); // 500ms timeout
         CHECK(join_result);
-        CHECK_FALSE(thread.IsActive());
+        CHECK_FALSE(thread->IsActive());
 
-        const auto& func_result = thread.GetFunctionResult();
+        const auto& func_result = thread->GetFunctionResult();
         CHECK(func_result);
     }
 
@@ -153,15 +153,15 @@ TEST_SUITE("rsbl::Thread")
         auto thread = rsblMove(thread_result.Value());
 
         // Join with a timeout shorter than the sleep
-        auto join_result = thread.JoinTimeout(50); // 50ms timeout
+        auto join_result = thread->JoinTimeout(50); // 50ms timeout
         CHECK_FALSE(join_result);
         CHECK(std::string(join_result.FailureText()) == "Thread join timeout");
 
         // Thread should still be active
-        CHECK(thread.IsActive());
+        CHECK(thread->IsActive());
 
         // Now join properly to clean up
-        auto final_join = thread.Join();
+        auto final_join = thread->Join();
         CHECK(final_join);
     }
 
@@ -175,11 +175,11 @@ TEST_SUITE("rsbl::Thread")
         auto thread = rsblMove(thread_result.Value());
 
         // First join should succeed
-        auto join_result1 = thread.Join();
+        auto join_result1 = thread->Join();
         CHECK(join_result1);
 
         // Second join should fail
-        auto join_result2 = thread.Join();
+        auto join_result2 = thread->Join();
         CHECK_FALSE(join_result2);
         CHECK(std::string(join_result2.FailureText()) == "Thread already joined");
     }
@@ -206,7 +206,7 @@ TEST_SUITE("rsbl::Thread")
         REQUIRE(thread_result);
         auto thread = rsblMove(thread_result.Value());
 
-        auto join_result = thread.Join();
+        auto join_result = thread->Join();
         CHECK(join_result);
 
         uint64 worker_thread_id = thread_id.load(std::memory_order_acquire);
@@ -214,7 +214,7 @@ TEST_SUITE("rsbl::Thread")
         CHECK(worker_thread_id != main_thread_id);
     }
 
-    TEST_CASE("Thread move constructor")
+    TEST_CASE("UniquePtr move of thread")
     {
         auto thread_result = Thread::Create([]() -> Result<> {
             Thread::ThreadSleep(50);
@@ -224,18 +224,18 @@ TEST_SUITE("rsbl::Thread")
         REQUIRE(thread_result);
         auto thread1 = rsblMove(thread_result.Value());
 
-        // Move thread1 to thread2
+        // Move the UniquePtr to thread2
         auto thread2 = rsblMove(thread1);
 
         // thread2 should be joinable
-        auto join_result = thread2.Join();
+        auto join_result = thread2->Join();
         CHECK(join_result);
 
-        const auto& func_result = thread2.GetFunctionResult();
+        const auto& func_result = thread2->GetFunctionResult();
         CHECK(func_result);
     }
 
-    TEST_CASE("Thread move assignment")
+    TEST_CASE("UniquePtr move assignment")
     {
         auto thread_result1 = Thread::Create([]() -> Result<> {
             return ResultCode::Success;
@@ -252,17 +252,17 @@ TEST_SUITE("rsbl::Thread")
         auto thread1 = rsblMove(thread_result1.Value());
         auto thread2 = rsblMove(thread_result2.Value());
 
-        // Move assign thread2 to thread1
-        // This should join thread1 first
+        // Move assign the UniquePtr from thread2 to thread1
+        // This should destroy thread1's thread (joining it first in destructor)
         thread1 = rsblMove(thread2);
 
         // thread1 should now have thread2's task
-        auto join_result = thread1.Join();
+        auto join_result = thread1->Join();
         CHECK(join_result);
 
-        const auto& func_result = thread1.GetFunctionResult();
+        const auto& func_result = thread1->GetFunctionResult();
         CHECK_FALSE(func_result);
-        CHECK(std::string(thread1.GetResultText()) == "Test failure");
+        CHECK(std::string(thread1->GetResultText()) == "Test failure");
     }
 
     TEST_CASE("Destructor joins thread automatically")
@@ -314,8 +314,8 @@ TEST_SUITE("rsbl::Thread")
         auto thread1 = rsblMove(thread1_result.Value());
         auto thread2 = rsblMove(thread2_result.Value());
 
-        auto join1 = thread1.Join();
-        auto join2 = thread2.Join();
+        auto join1 = thread1->Join();
+        auto join2 = thread2->Join();
 
         CHECK(join1);
         CHECK(join2);

@@ -136,6 +136,39 @@ using Claude Opus to plan, and Gemini to implement, and that makes a lot of sens
 
 ## Threads
 
+I wanted to have a simple drop-in replacement for `std::Thread`. The MSVC `std::Thread` implementation isn't that bad,
+when I looked at the implementation. The `Invoker_` logic was kinda gnarly, but overall, it wasn't as heavy as I
+expected. Still, I wanted to have a local implementation for the experience.
+
+I have three uses in mind for threads:
+
+* Thread pool to execute task/job graph system
+* Thread pool to execute render graph
+* Single thread to process render command lists
+
+Given these modes, I'm looking at a fixed set of threads that I'm operating (likely based on available system
+resources). So I'm not going to be creating and shutting down threads constantly, which means whatever I allocate is
+mostly set for the lifetime of the app.
+
+I also need to think about how I handle errors from creation, activity, and shutdown. Creation seems to be the tricky
+one for me. If I **allow** moves, I need to have a pointer to internal resources _inside_ `rsbl::Thread` that moves
+around. The main move that would happen would be when I create the thread, I want to move out of `rsbl::Result` into the
+target destination. If I **don't allow** moves, I need to return a pointer to an allocated `rsbl::Thread`, and then
+move/copy the pointer to the storage. Basically the same thing either way. I prefer returning a pointer from `Create`
+because I think the intent is clearer at the callsite.
+
+Bonus of not-movable: not having to implement those two constructors :p
+
+### LLM Challenges
+
 Just like the Platform Window, Claude had problems understanding how to give private member access to a file static
 function. This time, I used a lambda inside a private function, which worked out...awesome! The function launcher lambda
 was super simple, and made sense to be defined inline before passing to `CreateThread`.
+
+The LLM implementation exposed a gap in my architectural thoughts about how `rsbl::Thread` should work. I initially
+allowed moves for `rsbl::Thread` but I didn't actually think about the implications. Once the execution of the thread
+starts, it uses a pointer to the `rsbl::Thread` object to get the function and return a result. However, if we move away
+from a `rsbl::Thread`, that means the previous instance is no longer valid!
+
+I have to make a choice: wrap the internals in a pointer and move the internals OR don't allow moves! This comes down to
+HOW I want to use `rsbl::Thread`, which is discussed above.

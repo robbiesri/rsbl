@@ -20,20 +20,21 @@ Thread::Thread()
 {
 }
 
-Result<Thread> Thread::Create(Function<Result<>()>&& thread_func)
+Result<UniquePtr<Thread>> Thread::Create(Function<Result<>()>&& thread_func)
 {
-    Thread thread;
-    thread.m_threadFunc = rsblMove(thread_func);
-    thread.m_isActive.store(true, std::memory_order_release);
+    // Allocate thread object on the heap so it stays at a fixed memory location
+    auto thread = UniquePtr<Thread>(new Thread);
+    thread->m_threadFunc = rsblMove(thread_func);
+    thread->m_isActive.store(true, std::memory_order_release);
 
-    auto platform_result = CreatePlatformThread(&thread);
+    auto platform_result = CreatePlatformThread(thread.Get());
     if (!platform_result)
     {
-        thread.m_isActive.store(false, std::memory_order_release);
+        thread->m_isActive.store(false, std::memory_order_release);
         return platform_result.FailureText();
     }
 
-    thread.m_platformData = platform_result.Value();
+    thread->m_platformData = platform_result.Value();
     return rsblMove(thread);
 }
 
@@ -50,54 +51,6 @@ Thread::~Thread()
     {
         ::CloseHandle(static_cast<HANDLE>(m_platformData.platform_handle));
     }
-}
-
-Thread::Thread(Thread&& other) noexcept
-    : m_threadFunc(rsblMove(other.m_threadFunc))
-    , m_result(rsblMove(other.m_result))
-    , m_isActive(other.m_isActive.load(std::memory_order_acquire))
-    , m_joined(other.m_joined)
-    , m_platformData(other.m_platformData)
-{
-    // Copy failure text
-    std::memcpy(m_failureText, other.m_failureText, kMaxFailureTextLength);
-
-    // Invalidate the moved-from thread
-    other.m_platformData.platform_handle = nullptr;
-    other.m_joined = true; // Prevent double-join
-}
-
-Thread& Thread::operator=(Thread&& other) noexcept
-{
-    if (this != &other)
-    {
-        // Join our current thread if needed
-        if (!m_joined && m_platformData.platform_handle != nullptr)
-        {
-            // TODO: Log the join results
-            rsblUnused(Join());
-        }
-
-        // Close our current handle
-        if (m_platformData.platform_handle != nullptr)
-        {
-            ::CloseHandle(static_cast<HANDLE>(m_platformData.platform_handle));
-        }
-
-        // Move data from other
-        m_threadFunc = rsblMove(other.m_threadFunc);
-        m_result = rsblMove(other.m_result);
-        m_isActive.store(other.m_isActive.load(std::memory_order_acquire),
-                         std::memory_order_release);
-        m_joined = other.m_joined;
-        m_platformData = other.m_platformData;
-        std::memcpy(m_failureText, other.m_failureText, kMaxFailureTextLength);
-
-        // Invalidate the moved-from thread
-        other.m_platformData.platform_handle = nullptr;
-        other.m_joined = true;
-    }
-    return *this;
 }
 
 bool Thread::IsActive() const
