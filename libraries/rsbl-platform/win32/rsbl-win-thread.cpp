@@ -43,8 +43,9 @@ Thread::~Thread()
     // Join if not already joined to ensure thread completes
     if (!m_joined && m_platformData.platform_handle != nullptr)
     {
-        rsblUnused(Join());
         // TODO: log failure to join? We're fubar at this point
+        auto join_result = Join();
+        rsblUnused(join_result);
     }
 
     if (m_platformData.platform_handle != nullptr)
