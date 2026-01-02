@@ -133,3 +133,9 @@ A couple takeaways from the process with LLMs
 I think I'll continue to use Claude Code because I like the UX, but I'm going to seriously investigate other agentic
 terminal tools, because I think I want to swap in Gemini for pricing reasons. I've seen people on Hacker News talk about
 using Claude Opus to plan, and Gemini to implement, and that makes a lot of sense to me after this test case.
+
+## Threads
+
+Just like the Platform Window, Claude had problems understanding how to give private member access to a file static
+function. This time, I used a lambda inside a private function, which worked out...awesome! The function launcher lambda
+was super simple, and made sense to be defined inline before passing to `CreateThread`.

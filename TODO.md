@@ -26,24 +26,11 @@
 [x] Command line options lib - CLI11
 [x] Use release zips instead of subtrees?
 [x] Function alternative to std::function
+[ ] Add logging to libraries!
 [ ] Cache release zips on personal S3 bucket?
-
-## Render Architecture
-
-[ ] Build command list in render thread, send to execution thread to convert to API commands
-[ ] Execution thread converts to API commands, builds command buffer, and submits.
-[ ] Shader compile threads?
-[ ] Resource creation happens in app thread
-[ ] App loads resources from file, then creates associated rendering resources + scene graph
-[ ] App thread defers loading to async loader thread
-[ ] App thread builds scene (graph), submits to render thread to execute
+[ ] Profiling infrastructure (Tracy?)
 
 ## General Systems
-
-[ ] CPU parallel job system, similar to PS3 cell system
-[ ] Task graph system?
-
-## Thread Management
 
 ## Functions
 
@@ -56,3 +43,35 @@
 [x] Easy to debug
 [x] No STL except placement new (and internal move + forward)
 [x] Allow implicit conversions in call operator (different parameter pack type vs function template)
+
+## Thread Management
+
+[ ] Simpler alternative to std::thread
+[ ] Minimal includes, avoid heavy STL headers
+[ ] Build on rsbl::Function, rsbl::Result and std::atomic
+[ ] Support sleep + yield
+[ ] Method to query if the thread is still actively processing the client function
+[ ] Join method that can take optional timeout
+
+## Task/Job System
+
+[ ] Read existing literature to figure out patterns
+[ ] Fibers vs threads?
+[ ] Express dependencies between tasks
+[ ] High, medium, low priority tasks
+[ ] Allow for 'fast' task generation with task IDs to parcel out parallel friendly tasks
+[ ] Visualizer for task hierarchy (Chrome?)
+
+## Render Architecture
+
+[ ] Build command list in render thread, send to execution thread to convert to API commands
+[ ] Execution thread converts to API commands, builds command buffer, and submits.
+[ ] Shader compile threads?
+[ ] Resource creation happens in app thread
+[ ] App loads resources from file, then creates associated rendering resources + scene graph
+[ ] App thread defers loading to async loader thread
+[ ] App thread builds scene (graph), submits to render thread to execute
+
+### Render Task Graph
+
+[ ] Similar to task system, but handle render transitions (build on top of task system?)

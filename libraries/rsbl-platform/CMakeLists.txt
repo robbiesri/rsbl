@@ -5,12 +5,14 @@ set(LIB_NAME rsbl-platform)
 
 list(APPEND PUBLIC_HEADER_FILES
         include/rsbl-file.h
+        include/rsbl-thread.h
         include/rsbl-window.h
 )
 
 if (WIN32)
     list(APPEND PRIVATE_SOURCE_FILES
             win32/rsbl-win-file.cpp
+            win32/rsbl-win-thread.cpp
             win32/rsbl-win-window.cpp
     )
 endif ()
@@ -34,3 +36,10 @@ if (WIN32)
     # Override /Wall with /W3 for Windows implementation to reduce noise from Windows headers
     target_compile_options(${LIB_NAME} PRIVATE /W3)
 endif ()
+
+# Tests
+rsbl_add_tests(
+        SOURCES
+        rsbl-thread.test.cpp
+        LIBRARIES ${LIB_NAME}
+)
