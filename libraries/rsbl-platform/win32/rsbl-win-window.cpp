@@ -66,7 +66,7 @@ long long Window::WindowProc(void* handle,
     // Retrieve the Window pointer stored in the window's user data
     // Before we call SetWindowLongPtrA, this will be nullptr. So make we check if window is valid
     // first!
-    auto* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
+    auto* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, 0));
     const uint2 cached_size = (window != nullptr) ? window->m_size : uint2(0, 0);
 
     auto UpdateClientSize = [window, hwnd, cached_size]() {
@@ -169,7 +169,7 @@ Result<UniquePtr<Window>> Window::Create(uint2 size, int2 position)
     window->m_platformData.platform_handle = hwnd;
 
     // Store the Window pointer in the window's user data for access in WindowProc
-    SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
+    SetWindowLongPtrA(hwnd, 0, reinterpret_cast<LONG_PTR>(window));
 
     // Query the actual window position and size from Windows, but retain the expected 'client' area
     RECT created_window_rect;
