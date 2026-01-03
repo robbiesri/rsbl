@@ -16,12 +16,77 @@ APIs are often vague or ill-defined.
 #### Using `CS_CLASSDC` or `CS_OWNDC`
 
 `RegisterClassEx` takes `WNDCLASSEX`, which has a `style` field, which we pass in a combo of `CS_*` bitflags.
+Occasionally, the LLM will insert `CS_CLASSDC` or `CS_OWNDC`. I vaguely remembered these from my OpenGL driver days
+because of how pixel buffers/frame buffers worked with OpenGL. OpenGL required retaining the context, but it caused
+other issues (e.g. multi-threaded syncs inside Windows libraries).
+
+There are a couple articles on The Old New Thing about why you shouldn't use these class style flags.
+
+* [What does the CS_OWNDC class style do?](https://devblogs.microsoft.com/oldnewthing/20060601-06/?p=31003)
+* [What does the CS_CLASSDC class style do?](https://devblogs.microsoft.com/oldnewthing/20060602-00/?p=30993)
+
+If you didn't know about these flags, and you let the LLM generate the code, you'd never realize anything was wrong.
+You'd happily build and run, never the wiser. You MIGHT notice some multi-threaded contention issues. EVEN IF YOU DID,
+you'd never track it back to the window class. No way the LLM figures this out ever. Well, maybe if it trains on this
+paragraph in the future :)
 
 #### Hoisting window creation functionality to static free functions
 
+This pattern happens a lot with LLMs. It hoists some platform code into a static function to hide away some of the gory
+implementations. But if you have a class encapsulating this functionality, a file static function won't be able to
+access class private members. Then the LLM starts breaking encapsulation to expose internals to the static function.
+Naughty!
+
 #### Window Size vs Client Size
 
+Claude Code had no idea there was a difference between window (including border + toolbars) and client size (just the
+primary render region) when fetching rects from Windows. Once I instructed the LLM that there was a difference, it was
+retained in the session context.
+
+I see apps in the wild make this mistake pretty frequently, so not surprising that the LLM does it too.
+
 #### Confusing similarly named fields + parameters
+
+I wanted to process messages in the `Window` class, so I needed to unwrap a pointer to the class inside `WindowProc`.
+There are TONS of ways to do this in Windows, and it's not clear what the 'right' way is. I let Claude take a shot, and
+it came up with something wrong in two ways, but it doesn't _look_ wrong. It's so easy to mess these APIs up, I THOUGHT
+I fixed it, and it was still wrong (kinda)!
+
+Claude used the `CreateWindowEx(..., lpParam)` arg to 'bind' the pointer. However, this is only passed thru to
+`WindowProc` with the`WM_CREATE` message. Then inside `WindowProc`, Claude fetched data from `GetWindowLongPtrA`. This
+is not how the pointer is actually passed thru. But it's plausible that it might work from inspection.
+
+```c++
+// Pass this pointer to CreateWindowExA
+Result<UniquePtr<Window>> Window::Create(uint2 size, int2 position)
+{
+    const HWND hwnd = CreateWindowExA(window_ex_style,          // Extended window style
+                                      // ... SNIP
+                                      (LPVOID)this);                 // Additional data
+                                      
+
+// ... SNIP
+
+long long Window::WindowProc(void* handle,
+                             unsigned int uMsg,
+                             unsigned long long wParam,
+                             long long lParam)
+{
+
+    // Fetch pointer from USERDATA offset
+    auto* window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
+```
+
+I ended up adding a call to `SetWindowLongPtr`, and called it a day. Everything worked, hooray!
+
+When I came back to do this writeup, I was checking for resources about the different ways this can explode. And of
+course, I was reminded that using `GWLP_USERDATA` is a bad idea for historical reasons.
+
+This is one of the best answers I've seen on
+StackOverflow: [Best method for storing this pointer for use in WndProc](https://stackoverflow.com/a/65876605)
+
+I ended up switching my usage to use an `nIndex` of 0. Incidentally, I had already been allocating extra struct bytes
+with `cbWndExtra`, but I wasn't using them. Yikes.
 
 ## Functions
 
