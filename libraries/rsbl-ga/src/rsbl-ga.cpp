@@ -1,18 +1,10 @@
 // Copyright 2025 Robert Srinivasiah
 // Licensed under the MIT License, see the LICENSE file for more info
 
-#include <rsbl-ga.h>
+#include "rsbl-ga-backends.h"
 
 namespace rsbl
 {
-
-// Forward declarations of backend-specific creation functions
-namespace backend
-{
-Result<gaDevice*> createNullDevice(const gaDeviceCreateInfo& createInfo);
-Result<gaDevice*> createDX12Device(const gaDeviceCreateInfo& createInfo);
-Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo);
-} // namespace backend
 
 Result<gaDevice*> gaCreateDevice(const gaDeviceCreateInfo& createInfo)
 {
