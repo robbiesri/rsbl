@@ -10,25 +10,25 @@ namespace rsbl
 
 enum class gaBackend
 {
-	Null,   // No-op implementation for API validation
-	DX12,   // DirectX 12
-	Vulkan, // Vulkan
+    Null,   // No-op implementation for API validation
+    DX12,   // DirectX 12
+    Vulkan, // Vulkan
 };
 
 struct gaDeviceCreateInfo
 {
-	gaBackend backend = gaBackend::Null;
-	bool enableValidation = false; // Enable debug/validation layers
-	const char* appName = "rsbl Application";
-	u32 appVersion = 1;
+    gaBackend backend = gaBackend::Null;
+    bool enableValidation = false; // Enable debug/validation layers
+    const char* appName = "rsbl Application";
+    uint32 appVersion = 1;
 };
 
 struct gaDevice
 {
-	gaBackend backend;
-	void* internalHandle; // Backend-specific device handle
+    gaBackend backend;
+    void* internalHandle; // Backend-specific device handle
 
-	virtual ~gaDevice() = default;
+    virtual ~gaDevice() = default;
 };
 
 Result<gaDevice*> gaCreateDevice(const gaDeviceCreateInfo& createInfo);
