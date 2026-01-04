@@ -16,6 +16,7 @@ if (WIN32)
     list(APPEND PRIVATE_SOURCE_FILES
             src/dx12/rsbl-ga-dx12.cpp
     )
+    # DX12 libraries will be linked below
 endif ()
 
 # Vulkan backend (cross-platform when Vulkan SDK is available)
@@ -52,6 +53,10 @@ else()
 endif()
 
 if (WIN32)
+    # DX12 support
+    message(STATUS "DX12 backend enabled for Windows")
+    target_link_libraries(${LIB_NAME} PRIVATE d3d12.lib dxgi.lib)
+
     # Override /Wall with /W3 for Windows implementation to reduce noise from Windows headers
     target_compile_options(${LIB_NAME} PRIVATE /W3)
 endif ()
