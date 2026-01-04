@@ -9,7 +9,7 @@ list(APPEND PUBLIC_HEADER_FILES
         include/rsbl-window.h
 )
 
-if (WIN32)
+if (MSVC)
     list(APPEND PRIVATE_SOURCE_FILES
             win32/rsbl-win-file.cpp
             win32/rsbl-win-thread.cpp
@@ -32,8 +32,8 @@ target_link_libraries(${LIB_NAME}
         rsbl-core
 )
 
-if (WIN32)
-    # Override /Wall with /W3 for Windows implementation to reduce noise from Windows headers
+if (MSVC)
+    # Override /Wall with /W3 for MSVC to reduce noise from Windows headers
     target_compile_options(${LIB_NAME} PRIVATE /W3)
 endif ()
 

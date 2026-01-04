@@ -12,7 +12,7 @@ list(APPEND PRIVATE_SOURCE_FILES
         rsbl-ga-null.cpp
 )
 
-if (WIN32)
+if (MSVC)
     list(APPEND PRIVATE_SOURCE_FILES
             rsbl-ga-dx12.cpp
     )
@@ -58,11 +58,11 @@ else()
     message(STATUS "Vulkan SDK not found - Vulkan backend will not be available")
 endif()
 
-if (WIN32)
+if (MSVC)
     # DX12 support
-    message(STATUS "DX12 backend enabled for Windows")
+    message(STATUS "DX12 backend enabled for MSVC")
     target_link_libraries(${LIB_NAME} PRIVATE d3d12.lib dxgi.lib)
 
-    # Override /Wall with /W3 for Windows implementation to reduce noise from Windows headers
+    # Override /Wall with /W3 for MSVC to reduce noise from Windows headers
     target_compile_options(${LIB_NAME} PRIVATE /W3)
 endif ()
