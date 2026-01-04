@@ -64,6 +64,17 @@
 [ ] Allow for 'fast' task generation with task IDs to parcel out parallel friendly tasks
 [ ] Visualizer for task hierarchy (Chrome?)
 
+## Graphics API Abstraction
+
+[ ] Mix of free standing function + command list builders
+[ ] Free standing APIs to create resources - textures, buffers, shaders, render targets, render passes, devices
+[ ] Free standing APIs to reset + submit command lists
+[ ] Command list APIs to bind resources, draws + dispatch, and present
+[ ] Command lists are API opaque, and translated at submit time
+[ ] Command lists can be processed on 'submit' thread, or in main thread for debugging
+[ ] Resources can be created across multiple devices
+[ ] Submits can process across multiple devices
+
 ## Render Architecture
 
 [ ] Build command list in render thread, send to execution thread to convert to API commands
