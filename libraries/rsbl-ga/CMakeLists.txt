@@ -8,13 +8,13 @@ list(APPEND PUBLIC_HEADER_FILES
 )
 
 list(APPEND PRIVATE_SOURCE_FILES
-        src/rsbl-ga.cpp
-        src/rsbl-ga-null.cpp
+        rsbl-ga.cpp
+        rsbl-ga-null.cpp
 )
 
 if (WIN32)
     list(APPEND PRIVATE_SOURCE_FILES
-            src/dx12/rsbl-ga-dx12.cpp
+            rsbl-ga-dx12.cpp
     )
     # DX12 libraries will be linked below
 endif ()
@@ -25,12 +25,12 @@ find_package(Vulkan QUIET)
 # Add Vulkan backend only if SDK is found
 if (Vulkan_FOUND)
     list(APPEND PRIVATE_SOURCE_FILES
-            src/vulkan/rsbl-ga-vulkan.cpp
+            rsbl-ga-vulkan.cpp
     )
 else()
     # Add stub implementation when Vulkan is not available
     list(APPEND PRIVATE_SOURCE_FILES
-            src/vulkan/rsbl-ga-vulkan-stub.cpp
+            rsbl-ga-vulkan-stub.cpp
     )
 endif()
 
