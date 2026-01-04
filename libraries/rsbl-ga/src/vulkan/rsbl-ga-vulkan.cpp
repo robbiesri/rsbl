@@ -2,21 +2,12 @@
 // Licensed under the MIT License, see the LICENSE file for more info
 
 #include <rsbl-ga.h>
-
-// Vulkan SDK needs to be installed and in the include path
-// Uncomment when Vulkan SDK is available
-// #define RSBL_VULKAN_ENABLED
-
-#ifdef RSBL_VULKAN_ENABLED
 #include <vulkan/vulkan.h>
-#endif
 
 namespace rsbl
 {
 namespace backend
 {
-
-#ifdef RSBL_VULKAN_ENABLED
 
 struct VulkanDevice : public gaDevice
 {
@@ -169,15 +160,6 @@ Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo)
 
 	return device;
 }
-
-#else
-
-Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo)
-{
-	return "Vulkan support is not enabled. Install Vulkan SDK and define RSBL_VULKAN_ENABLED";
-}
-
-#endif // RSBL_VULKAN_ENABLED
 
 } // namespace backend
 } // namespace rsbl

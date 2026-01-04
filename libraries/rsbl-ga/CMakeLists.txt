@@ -19,13 +19,20 @@ if (WIN32)
     # DX12 libraries will be linked below
 endif ()
 
-# Vulkan backend (cross-platform when Vulkan SDK is available)
-list(APPEND PRIVATE_SOURCE_FILES
-        src/vulkan/rsbl-ga-vulkan.cpp
-)
-
 # Try to find Vulkan SDK
 find_package(Vulkan QUIET)
+
+# Add Vulkan backend only if SDK is found
+if (Vulkan_FOUND)
+    list(APPEND PRIVATE_SOURCE_FILES
+            src/vulkan/rsbl-ga-vulkan.cpp
+    )
+else()
+    # Add stub implementation when Vulkan is not available
+    list(APPEND PRIVATE_SOURCE_FILES
+            src/vulkan/rsbl-ga-vulkan-stub.cpp
+    )
+endif()
 
 add_library(${LIB_NAME} STATIC
         ${PUBLIC_HEADER_FILES}
@@ -45,7 +52,6 @@ target_link_libraries(${LIB_NAME}
 # Enable Vulkan if SDK is found
 if (Vulkan_FOUND)
     message(STATUS "Vulkan SDK found: ${Vulkan_INCLUDE_DIRS}")
-    target_compile_definitions(${LIB_NAME} PRIVATE RSBL_VULKAN_ENABLED)
     target_include_directories(${LIB_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
     target_link_libraries(${LIB_NAME} PRIVATE Vulkan::Vulkan)
 else()
