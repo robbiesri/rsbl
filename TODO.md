@@ -74,6 +74,13 @@
 [ ] Command lists can be processed on 'submit' thread, or in main thread for debugging
 [ ] Resources can be created across multiple devices
 [ ] Submits can process across multiple devices
+[ ] There should be DX12 and Vulkan implementations initially
+[ ] There should also be a Null implementation that can be used to validate API calls, but doesn't actually do rendering
+[ ] APIs should accept argument structs as much as possible, to prevent APIs with 4+ arguments
+[ ] Creation APIs should return pointers to graphics backend independent structs, which are cast to derived types valid
+to the underlying graphics API
+[ ] Textures + Buffers will be represented by a cross-backend opaque handle. Generate handle based on resource
+description, then _register_ handle with each backend-specific device!
 
 ## Render Architecture
 
