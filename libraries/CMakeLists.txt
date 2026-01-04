@@ -5,3 +5,4 @@
 
 add_subdirectory(rsbl-core)
 add_subdirectory(rsbl-platform)
+add_subdirectory(rsbl-ga)
