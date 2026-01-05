@@ -25,12 +25,9 @@ target_link_libraries(rsbl-log
         quill::quill
 )
 
-# Tests - simple integration test executable
-add_executable(rsbl-log-test
+# Tests
+rsbl_add_tests(
+        SOURCES
         rsbl-log.test.cpp
-)
-
-target_link_libraries(rsbl-log-test
-        PRIVATE
-        rsbl-log
+        LIBRARIES rsbl-log
 )
