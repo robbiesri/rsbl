@@ -14,6 +14,7 @@ add_executable(${APP_NAME}
 target_link_libraries(${APP_NAME}
         PUBLIC
         rsbl-platform
+        rsbl-ga
         fastgltf
         quill::quill
 )

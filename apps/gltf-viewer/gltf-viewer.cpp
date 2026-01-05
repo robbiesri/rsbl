@@ -1,6 +1,7 @@
 // Copyright 2025 Robert Srinivasiah
 // Licensed under the MIT License, see the LICENSE file for more info
 
+#include <rsbl-ga.h>
 #include <rsbl-ptr.h>
 #include <rsbl-window.h>
 
@@ -187,6 +188,34 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    rsbl::gaDevice* dx12_device = nullptr;
+    rsbl::gaDevice* vulkan_device = nullptr;
+
+    rsbl::gaDeviceCreateInfo create_info_dx12{};
+    create_info_dx12.backend = rsbl::gaBackend::DX12;
+    if (auto dx12_device_result = rsbl::GaCreateDevice(create_info_dx12))
+    {
+        dx12_device = dx12_device_result.Value();
+        LOG_INFO(logger, "DX12 device successfully created");
+    }
+    else
+    {
+        LOG_WARNING(logger, "Failed to create DX12 device: {}", dx12_device_result.FailureText());
+    }
+
+    rsbl::gaDeviceCreateInfo create_info_vulkan{};
+    create_info_vulkan.backend = rsbl::gaBackend::Vulkan;
+    if (auto vulkan_device_result = rsbl::GaCreateDevice(create_info_vulkan))
+    {
+        vulkan_device = vulkan_device_result.Value();
+        LOG_INFO(logger, "Vulkan device successfully created");
+    }
+    else
+    {
+        LOG_WARNING(
+            logger, "Failed to create Vulkan device: {}", vulkan_device_result.FailureText());
+    }
+
     while (window->ProcessMessages() != rsbl::WindowMessageResult::Quit)
     {
         // do stuff?
@@ -197,6 +226,9 @@ int main(int argc, char** argv)
             LOG_INFO(logger, "Resized window caught by app!");
         }
     }
+
+    rsbl::GaDestroyDevice(dx12_device);
+    rsbl::GaDestroyDevice(vulkan_device);
 
     return 0;
 }
