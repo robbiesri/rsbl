@@ -2,80 +2,72 @@
 // Licensed under the MIT License, see the LICENSE file for more info
 
 #include <rsbl-ga.h>
+#include <rsbl-log.h>
 #include <rsbl-ptr.h>
 #include <rsbl-window.h>
 
 #include <CLI11.hpp>
 #include <fastgltf/core.hpp>
 #include <fastgltf/types.hpp>
-#include <quill/Backend.h>
-#include <quill/Frontend.h>
-#include <quill/LogMacros.h>
-#include <quill/Logger.h>
-#include <quill/sinks/ConsoleSink.h>
-#include <quill/sinks/RotatingFileSink.h>
 
 #include <string>
 
-void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
+void print_gltf_stats(const fastgltf::Asset& asset)
 {
-    LOG_INFO(logger, "");
-    LOG_INFO(logger, "=== glTF File Statistics ===");
-    LOG_INFO(logger, "");
+    RSBL_LOG_INFO("");
+    RSBL_LOG_INFO("=== glTF File Statistics ===");
+    RSBL_LOG_INFO("");
 
     // Basic counts
-    LOG_INFO(logger, "Scenes:      {}", asset.scenes.size());
-    LOG_INFO(logger, "Nodes:       {}", asset.nodes.size());
-    LOG_INFO(logger, "Meshes:      {}", asset.meshes.size());
-    LOG_INFO(logger, "Materials:   {}", asset.materials.size());
-    LOG_INFO(logger, "Textures:    {}", asset.textures.size());
-    LOG_INFO(logger, "Images:      {}", asset.images.size());
-    LOG_INFO(logger, "Buffers:     {}", asset.buffers.size());
-    LOG_INFO(logger, "Animations:  {}", asset.animations.size());
-    LOG_INFO(logger, "Skins:       {}", asset.skins.size());
-    LOG_INFO(logger, "Cameras:     {}", asset.cameras.size());
+    RSBL_LOG_INFO("Scenes:      {}", asset.scenes.size());
+    RSBL_LOG_INFO("Nodes:       {}", asset.nodes.size());
+    RSBL_LOG_INFO("Meshes:      {}", asset.meshes.size());
+    RSBL_LOG_INFO("Materials:   {}", asset.materials.size());
+    RSBL_LOG_INFO("Textures:    {}", asset.textures.size());
+    RSBL_LOG_INFO("Images:      {}", asset.images.size());
+    RSBL_LOG_INFO("Buffers:     {}", asset.buffers.size());
+    RSBL_LOG_INFO("Animations:  {}", asset.animations.size());
+    RSBL_LOG_INFO("Skins:       {}", asset.skins.size());
+    RSBL_LOG_INFO("Cameras:     {}", asset.cameras.size());
 
     // Mesh details
     if (!asset.meshes.empty())
     {
-        LOG_INFO(logger, "");
-        LOG_INFO(logger, "=== Mesh Details ===");
+        RSBL_LOG_INFO("");
+        RSBL_LOG_INFO("=== Mesh Details ===");
         size_t total_primitives = 0;
         for (size_t i = 0; i < asset.meshes.size(); ++i)
         {
             const auto& mesh = asset.meshes[i];
             if (!mesh.name.empty())
             {
-                LOG_INFO(logger,
-                         "  Mesh {}: {} primitive(s) (name: {})",
-                         i,
-                         mesh.primitives.size(),
-                         mesh.name);
+                RSBL_LOG_INFO(
+                    "  Mesh {}: {} primitive(s) (name: {})", i, mesh.primitives.size(), mesh.name);
             }
             else
             {
-                LOG_INFO(logger, "  Mesh {}: {} primitive(s)", i, mesh.primitives.size());
+                RSBL_LOG_INFO("  Mesh {}: {} primitive(s)", i, mesh.primitives.size());
             }
             total_primitives += mesh.primitives.size();
         }
-        LOG_INFO(logger, "  Total primitives: {}", total_primitives);
+        RSBL_LOG_INFO("  Total primitives: {}", total_primitives);
     }
 
     // Material details
     if (!asset.materials.empty())
     {
-        LOG_INFO(logger, "");
-        LOG_INFO(logger, "=== Material Details ===");
+        RSBL_LOG_INFO("");
+        RSBL_LOG_INFO("=== Material Details ===");
         for (size_t i = 0; i < asset.materials.size(); ++i)
         {
             const auto& material = asset.materials[i];
             if (!material.name.empty())
             {
-                LOG_INFO(logger, "  Material {}: {}", i, material.name);
+                RSBL_LOG_INFO("  Material {}: {}", i, material.name);
             }
             else
             {
-                LOG_INFO(logger, "  Material {}", i);
+                RSBL_LOG_INFO("  Material {}", i);
             }
         }
     }
@@ -83,58 +75,34 @@ void print_gltf_stats(const fastgltf::Asset& asset, quill::Logger* logger)
     // Buffer sizes
     if (!asset.buffers.empty())
     {
-        LOG_INFO(logger, "");
-        LOG_INFO(logger, "=== Buffer Information ===");
+        RSBL_LOG_INFO("");
+        RSBL_LOG_INFO("=== Buffer Information ===");
         size_t total_bytes = 0;
         for (size_t i = 0; i < asset.buffers.size(); ++i)
         {
             const auto& buffer = asset.buffers[i];
             if (!buffer.name.empty())
             {
-                LOG_INFO(
-                    logger, "  Buffer {}: {} bytes (name: {})", i, buffer.byteLength, buffer.name);
+                RSBL_LOG_INFO(
+                    "  Buffer {}: {} bytes (name: {})", i, buffer.byteLength, buffer.name);
             }
             else
             {
-                LOG_INFO(logger, "  Buffer {}: {} bytes", i, buffer.byteLength);
+                RSBL_LOG_INFO("  Buffer {}: {} bytes", i, buffer.byteLength);
             }
             total_bytes += buffer.byteLength;
         }
-        LOG_INFO(logger,
-                 "  Total buffer size: {:.2f} KB ({:.2f} MB)",
-                 total_bytes / 1024.0,
-                 total_bytes / (1024.0 * 1024.0));
+        RSBL_LOG_INFO("  Total buffer size: {:.2f} KB ({:.2f} MB)",
+                      total_bytes / 1024.0,
+                      total_bytes / (1024.0 * 1024.0));
     }
 
-    LOG_INFO(logger, "");
+    RSBL_LOG_INFO("");
 }
 
 int main(int argc, char** argv)
 {
-    // Initialize quill backend
-    quill::Backend::start();
-
-    // Create console sink with custom pattern (just the message)
-    auto console_sink =
-        quill::Frontend::create_or_get_sink<quill::ConsoleSink>("console_sink", []() {
-            quill::ConsoleSinkConfig config;
-            config.set_override_pattern_formatter_options(quill::PatternFormatterOptions{
-                "%(time) %(thread_id) %(file_name):%(line_number) %(message)"});
-            return config;
-        }());
-
-    // Create rotating file sink that rotates daily
-    auto file_sink =
-        quill::Frontend::create_or_get_sink<quill::RotatingFileSink>("logs/gltf_viewer.log", []() {
-            quill::RotatingFileSinkConfig config;
-            config.set_rotation_time_daily("00:00"); // Rotate at midnight
-            config.set_max_backup_files(30);         // Keep 30 days of logs
-            return config;
-        }());
-
-    // Create logger with both sinks
-    quill::Logger* logger = quill::Frontend::create_or_get_logger(
-        "gltf_viewer", {std::move(console_sink), std::move(file_sink)});
+    rsbl_log_init("logs/gltf_viewer.log");
 
     CLI::App app("GLTF viewer");
 
@@ -143,7 +111,7 @@ int main(int argc, char** argv)
 
     CLI11_PARSE(app, argc, argv);
 
-    LOG_INFO(logger, "Loading glTF file: {}", file_path);
+    RSBL_LOG_INFO("Loading glTF file: {}", file_path);
 
     // Create fastgltf parser
     fastgltf::Parser parser;
@@ -152,7 +120,7 @@ int main(int argc, char** argv)
     auto data = fastgltf::GltfDataBuffer::FromPath(file_path);
     if (data.error() != fastgltf::Error::None)
     {
-        LOG_ERROR(logger, "Failed to load file: {}", fastgltf::getErrorMessage(data.error()));
+        RSBL_LOG_ERROR("Failed to load file: {}", fastgltf::getErrorMessage(data.error()));
         return 1;
     }
 
@@ -165,26 +133,26 @@ int main(int argc, char** argv)
         parser.loadGltf(data.get(), std::filesystem::path(file_path).parent_path(), gltfOptions);
     if (asset.error() != fastgltf::Error::None)
     {
-        LOG_ERROR(logger, "Failed to parse glTF: {}", fastgltf::getErrorMessage(asset.error()));
+        RSBL_LOG_ERROR("Failed to parse glTF: {}", fastgltf::getErrorMessage(asset.error()));
         return 1;
     }
 
-    LOG_INFO(logger, "Successfully loaded glTF file!");
+    RSBL_LOG_INFO("Successfully loaded glTF file!");
 
     // Print statistics
-    print_gltf_stats(asset.get(), logger);
+    print_gltf_stats(asset.get());
 
-    LOG_INFO(logger, "Starting window...");
+    RSBL_LOG_INFO("Starting window...");
     rsbl::UniquePtr<rsbl::Window> window;
     auto window_create_result = rsbl::Window::Create({640, 480});
     if (window_create_result)
     {
-        LOG_INFO(logger, "Window created successfully!");
+        RSBL_LOG_INFO("Window created successfully!");
         window = rsblMove(window_create_result.Value());
     }
     else
     {
-        LOG_ERROR(logger, "Failed to create window: {}", window_create_result.FailureText());
+        RSBL_LOG_ERROR("Failed to create window: {}", window_create_result.FailureText());
         return 1;
     }
 
@@ -196,11 +164,11 @@ int main(int argc, char** argv)
     if (auto dx12_device_result = rsbl::GaCreateDevice(create_info_dx12))
     {
         dx12_device = dx12_device_result.Value();
-        LOG_INFO(logger, "DX12 device successfully created");
+        RSBL_LOG_INFO("DX12 device successfully created");
     }
     else
     {
-        LOG_WARNING(logger, "Failed to create DX12 device: {}", dx12_device_result.FailureText());
+        RSBL_LOG_WARNING("Failed to create DX12 device: {}", dx12_device_result.FailureText());
     }
 
     rsbl::gaDeviceCreateInfo create_info_vulkan{};
@@ -208,12 +176,11 @@ int main(int argc, char** argv)
     if (auto vulkan_device_result = rsbl::GaCreateDevice(create_info_vulkan))
     {
         vulkan_device = vulkan_device_result.Value();
-        LOG_INFO(logger, "Vulkan device successfully created");
+        RSBL_LOG_INFO("Vulkan device successfully created");
     }
     else
     {
-        LOG_WARNING(
-            logger, "Failed to create Vulkan device: {}", vulkan_device_result.FailureText());
+        RSBL_LOG_WARNING("Failed to create Vulkan device: {}", vulkan_device_result.FailureText());
     }
 
     while (window->ProcessMessages() != rsbl::WindowMessageResult::Quit)
@@ -223,12 +190,14 @@ int main(int argc, char** argv)
         // TODO: check resize
         if (window->CheckResize())
         {
-            LOG_INFO(logger, "Resized window caught by app!");
+            RSBL_LOG_INFO("Resized window caught by app!");
         }
     }
 
     rsbl::GaDestroyDevice(dx12_device);
     rsbl::GaDestroyDevice(vulkan_device);
+
+    RSBL_LOG_INFO("Window closed, shutting down!");
 
     return 0;
 }

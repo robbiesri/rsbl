@@ -16,7 +16,6 @@ target_link_libraries(${APP_NAME}
         rsbl-platform
         rsbl-ga
         fastgltf
-        quill::quill
 )
 
 target_include_directories(${APP_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/CLI11)
