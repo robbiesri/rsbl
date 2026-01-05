@@ -2,9 +2,6 @@
 // Licensed under the MIT License, see the LICENSE file for more info
 
 #include "rsbl-ga-backends.h"
-
-#ifdef _WIN32
-
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
@@ -127,18 +124,3 @@ Result<gaDevice*> createDX12Device(const gaDeviceCreateInfo& createInfo)
 
 } // namespace backend
 } // namespace rsbl
-
-#else
-
-namespace rsbl
-{
-namespace backend
-{
-Result<gaDevice*> createDX12Device(const gaDeviceCreateInfo& createInfo)
-{
-	return "DX12 is only supported on Windows";
-}
-} // namespace backend
-} // namespace rsbl
-
-#endif // _WIN32

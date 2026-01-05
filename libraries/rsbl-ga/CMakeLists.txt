@@ -12,11 +12,16 @@ list(APPEND PRIVATE_SOURCE_FILES
         rsbl-ga-null.cpp
 )
 
+# Add DX12 backend only if MSVC is available
 if (MSVC)
     list(APPEND PRIVATE_SOURCE_FILES
             rsbl-ga-dx12.cpp
     )
-    # DX12 libraries will be linked below
+else ()
+    # Add stub implementation when MSVC is not available
+    list(APPEND PRIVATE_SOURCE_FILES
+            rsbl-ga-dx12-stub.cpp
+    )
 endif ()
 
 # Try to find Vulkan SDK
@@ -60,10 +65,11 @@ else ()
 endif ()
 
 if (MSVC)
-    # DX12 support
-    message(STATUS "DX12 backend enabled for MSVC")
+    message(STATUS "DX12 backend enabled")
     target_link_libraries(${LIB_NAME} PRIVATE d3d12.lib dxgi.lib)
 
     # Override /Wall with /W3 for MSVC to reduce noise from Windows headers
     target_compile_options(${LIB_NAME} PRIVATE /W3)
+else ()
+    message(STATUS "DX12 backend not available - requires MSVC compiler")
 endif ()
