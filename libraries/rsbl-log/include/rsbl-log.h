@@ -3,6 +3,13 @@
 
 #pragma once
 
+/**
+ * By defining QUILL_DISABLE_NON_PREFIXED_MACROS before including LogMacros, we disable the
+ * default 'LOG_' and then create our own macros using the global logger.
+ * Usage borrowed from quill recommend usage examples
+ */
+#define QUILL_DISABLE_NON_PREFIXED_MACROS
+
 // Expose quill headers as required by TODO.md
 #include "quill/LogMacros.h"
 #include "quill/Logger.h"
@@ -28,11 +35,11 @@ void rsbl_log_init(const char* log_file_path);
 extern quill::Logger* g_rsbl_logger;
 
 // Convenience macros that use the global logger to simplify usage
-#define RSBL_LOG_TRACE_L3(...) LOG_TRACE_L3(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_TRACE_L2(...) LOG_TRACE_L2(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_TRACE_L1(...) LOG_TRACE_L1(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_DEBUG(...) LOG_DEBUG(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_INFO(...) LOG_INFO(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_WARNING(...) LOG_WARNING(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_ERROR(...) LOG_ERROR(g_rsbl_logger, __VA_ARGS__)
-#define RSBL_LOG_CRITICAL(...) LOG_CRITICAL(g_rsbl_logger, __VA_ARGS__)
+#define RSBL_LOG_TRACE_L3(fmt, ...) QUILL_LOG_TRACE_L3(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_TRACE_L2(fmt, ...) QUILL_LOG_TRACE_L2(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_TRACE_L1(fmt, ...) QUILL_LOG_TRACE_L1(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_DEBUG(fmt, ...) QUILL_LOG_DEBUG(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_INFO(fmt, ...) QUILL_LOG_INFO(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_WARNING(fmt, ...) QUILL_LOG_WARNING(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_ERROR(fmt, ...) QUILL_LOG_ERROR(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_CRITICAL(fmt, ...) QUILL_LOG_CRITICAL(g_rsbl_logger, fmt, __VA_ARGS__)
