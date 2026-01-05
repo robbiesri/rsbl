@@ -25,7 +25,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 if (MSVC)
+    message(STATUS "MSVC compiler detected. Version: ${MSVC_VERSION}")
+    message(STATUS "C++ Compiler path: ${CMAKE_CXX_COMPILER}")
+    message(STATUS "C Compiler path: ${CMAKE_C_COMPILER}")
+    message(STATUS "Linker path: ${CMAKE_LINKER}")
     include(msvc-defaults)
+
+    # Display Windows SDK version
+    if (CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION)
+        message(STATUS "Windows SDK Version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+    endif ()
 endif ()
 
 # Haven't thought about this much before, but Claude suggested it

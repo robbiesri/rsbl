@@ -27,12 +27,12 @@ if (Vulkan_FOUND)
     list(APPEND PRIVATE_SOURCE_FILES
             rsbl-ga-vulkan.cpp
     )
-else()
+else ()
     # Add stub implementation when Vulkan is not available
     list(APPEND PRIVATE_SOURCE_FILES
             rsbl-ga-vulkan-stub.cpp
     )
-endif()
+endif ()
 
 add_library(${LIB_NAME} STATIC
         ${PUBLIC_HEADER_FILES}
@@ -52,11 +52,12 @@ target_link_libraries(${LIB_NAME}
 # Enable Vulkan if SDK is found
 if (Vulkan_FOUND)
     message(STATUS "Vulkan SDK found: ${Vulkan_INCLUDE_DIRS}")
+    message(STATUS "Vulkan backend enabled")
     target_include_directories(${LIB_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
     target_link_libraries(${LIB_NAME} PRIVATE Vulkan::Vulkan)
-else()
+else ()
     message(STATUS "Vulkan SDK not found - Vulkan backend will not be available")
-endif()
+endif ()
 
 if (MSVC)
     # DX12 support

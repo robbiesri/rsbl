@@ -29,6 +29,8 @@
 [ ] Add logging to libraries!
 [ ] Cache release zips on personal S3 bucket?
 [ ] Profiling infrastructure (Tracy?)
+[ ] Hermetic Vulkan SDK install - Run install in copy-only mode
+[ ] Hermetic Vulkan SDK install - Set VK_LAYER_PATH environment variable to local path (from inside app?)
 
 ## General Systems
 
