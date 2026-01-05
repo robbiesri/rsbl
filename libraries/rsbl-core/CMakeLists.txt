@@ -27,6 +27,11 @@ target_include_directories(rsbl-core
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+target_link_libraries(rsbl-core
+        PUBLIC
+        rsbl-log
+)
+
 # Tests
 rsbl_add_tests(
         SOURCES

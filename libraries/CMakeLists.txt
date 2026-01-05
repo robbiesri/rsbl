@@ -3,6 +3,7 @@
 
 # Top level libraries CMakeLists, include all the static libs
 
+add_subdirectory(rsbl-log)
 add_subdirectory(rsbl-core)
 add_subdirectory(rsbl-platform)
 add_subdirectory(rsbl-ga)
