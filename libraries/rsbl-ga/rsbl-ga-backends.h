@@ -13,9 +13,9 @@ namespace rsbl
 namespace backend
 {
 
-Result<gaDevice*> createNullDevice(const gaDeviceCreateInfo& createInfo);
-Result<gaDevice*> createDX12Device(const gaDeviceCreateInfo& createInfo);
-Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo);
+    Result<gaDevice*> CreateNullDevice(const gaDeviceCreateInfo& createInfo);
+    Result<gaDevice*> CreateDX12Device(const gaDeviceCreateInfo& createInfo);
+    Result<gaDevice*> CreateVulkanDevice(const gaDeviceCreateInfo& createInfo);
 
 } // namespace backend
 } // namespace rsbl

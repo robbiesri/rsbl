@@ -33,7 +33,7 @@ struct gaDevice
     virtual ~gaDevice() = default;
 };
 
-Result<gaDevice*> gaCreateDevice(const gaDeviceCreateInfo& createInfo);
-void gaDestroyDevice(gaDevice* device);
+Result<gaDevice*> GaCreateDevice(const gaDeviceCreateInfo& createInfo);
+void GaDestroyDevice(gaDevice* device);
 
 } // namespace rsbl

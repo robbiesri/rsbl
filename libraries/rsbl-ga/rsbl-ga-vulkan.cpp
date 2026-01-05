@@ -59,7 +59,7 @@ namespace backend
         }
     };
 
-    Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo)
+    Result<gaDevice*> CreateVulkanDevice(const gaDeviceCreateInfo& createInfo)
     {
         auto device = rsbl::UniquePtr(new VulkanDevice());
 

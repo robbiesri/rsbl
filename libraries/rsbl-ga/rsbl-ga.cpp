@@ -6,33 +6,33 @@
 namespace rsbl
 {
 
-Result<gaDevice*> gaCreateDevice(const gaDeviceCreateInfo& createInfo)
+Result<gaDevice*> GaCreateDevice(const gaDeviceCreateInfo& createInfo)
 {
-	switch (createInfo.backend)
-	{
-	case gaBackend::Null:
-		return backend::createNullDevice(createInfo);
+    switch (createInfo.backend)
+    {
+    case gaBackend::Null:
+        return backend::CreateNullDevice(createInfo);
 
-	case gaBackend::DX12:
-		return backend::createDX12Device(createInfo);
+    case gaBackend::DX12:
+        return backend::CreateDX12Device(createInfo);
 
-	case gaBackend::Vulkan:
-		return backend::createVulkanDevice(createInfo);
+    case gaBackend::Vulkan:
+        return backend::CreateVulkanDevice(createInfo);
 
-	default:
-		return "Unknown graphics backend";
-	}
+    default:
+        return "Unknown graphics backend";
+    }
 }
 
-void gaDestroyDevice(gaDevice* device)
+void GaDestroyDevice(gaDevice* device)
 {
-	if (device == nullptr)
-	{
-		return;
-	}
+    if (device == nullptr)
+    {
+        return;
+    }
 
-	// Virtual destructor will call the appropriate backend-specific destructor
-	delete device;
+    // Virtual destructor will call the appropriate backend-specific destructor
+    delete device;
 }
 
 } // namespace rsbl

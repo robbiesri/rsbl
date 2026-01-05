@@ -22,7 +22,7 @@ struct NullDevice : public gaDevice
 	}
 };
 
-Result<gaDevice*> createNullDevice(const gaDeviceCreateInfo& createInfo)
+Result<gaDevice*> CreateNullDevice(const gaDeviceCreateInfo& createInfo)
 {
 	// Null backend always succeeds and validates API usage
 	NullDevice* device = new NullDevice();

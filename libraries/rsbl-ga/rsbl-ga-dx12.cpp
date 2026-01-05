@@ -49,7 +49,7 @@ namespace backend
         }
     };
 
-    Result<gaDevice*> createDX12Device(const gaDeviceCreateInfo& createInfo)
+    Result<gaDevice*> CreateDX12Device(const gaDeviceCreateInfo& createInfo)
     {
         auto device = rsbl::UniquePtr(new DX12Device());
 
