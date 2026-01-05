@@ -5,6 +5,8 @@
 
 #include <rsbl-result.h>
 
+// TODO: check for async compute during device creation?
+
 namespace rsbl
 {
 

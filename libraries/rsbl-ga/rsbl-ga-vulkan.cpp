@@ -2,7 +2,16 @@
 // Licensed under the MIT License, see the LICENSE file for more info
 
 #include "rsbl-ga-backends.h"
+
+#include <rsbl-dynamic-array.h>
+#include <rsbl-ptr.h>
+
 #include <vulkan/vulkan.h>
+
+// TODO: Convert gaDeviceCreateInfo::appVersion to engineVersion
+// TODO: Process to reasonably select device
+// TODO: set up VkDebugUtilsMessengerEXT
+// TODO: Query instance + device layers, check against requests
 
 namespace rsbl
 {
@@ -33,8 +42,8 @@ namespace backend
             if (debugMessenger != VK_NULL_HANDLE)
             {
                 auto vkDestroyDebugUtilsMessengerEXT =
-                    (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-                        instance, "vkDestroyDebugUtilsMessengerEXT");
+                    reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                        vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
                 if (vkDestroyDebugUtilsMessengerEXT != nullptr)
                 {
                     vkDestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
@@ -52,7 +61,7 @@ namespace backend
 
     Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo)
     {
-        VulkanDevice* device = new VulkanDevice();
+        auto device = rsbl::UniquePtr(new VulkanDevice());
 
         // Application info
         VkApplicationInfo appInfo{};
@@ -80,7 +89,6 @@ namespace backend
         VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &device->instance);
         if (result != VK_SUCCESS)
         {
-            delete device;
             return "Failed to create Vulkan instance";
         }
 
@@ -90,25 +98,23 @@ namespace backend
 
         if (deviceCount == 0)
         {
-            delete device;
             return "Failed to find GPUs with Vulkan support";
         }
 
-        VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[deviceCount];
-        vkEnumeratePhysicalDevices(device->instance, &deviceCount, physicalDevices);
+        rsbl::DynamicArray<VkPhysicalDevice> physicalDevices(deviceCount);
+        vkEnumeratePhysicalDevices(device->instance, &deviceCount, physicalDevices.Data());
 
         // For now, just pick the first device
         device->physicalDevice = physicalDevices[0];
-        delete[] physicalDevices;
 
         // Find queue family
         uint32 queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(
             device->physicalDevice, &queueFamilyCount, nullptr);
 
-        VkQueueFamilyProperties* queueFamilies = new VkQueueFamilyProperties[queueFamilyCount];
+        rsbl::DynamicArray<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(
-            device->physicalDevice, &queueFamilyCount, queueFamilies);
+            device->physicalDevice, &queueFamilyCount, queueFamilies.Data());
 
         uint32 graphicsQueueFamilyIndex = 0;
         bool foundGraphicsQueue = false;
@@ -121,11 +127,9 @@ namespace backend
                 break;
             }
         }
-        delete[] queueFamilies;
 
         if (!foundGraphicsQueue)
         {
-            delete device;
             return "Failed to find graphics queue family";
         }
 
@@ -144,24 +148,18 @@ namespace backend
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
-
-        if (createInfo.enableValidation)
-        {
-            deviceCreateInfo.enabledLayerCount = 1;
-            deviceCreateInfo.ppEnabledLayerNames = validationLayers;
-        }
+        // deviceCreateInfo.flags = 0; // flags not needed currently, according to spec
 
         result = vkCreateDevice(
             device->physicalDevice, &deviceCreateInfo, nullptr, &device->logicalDevice);
         if (result != VK_SUCCESS)
         {
-            delete device;
             return "Failed to create Vulkan logical device";
         }
 
         device->internalHandle = device->logicalDevice;
 
-        return device;
+        return device.Release();
     }
 
 } // namespace backend
