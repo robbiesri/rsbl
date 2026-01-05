@@ -11,16 +11,16 @@
 int main()
 {
     // Initialize the logger
-    rsbl_log_init("test_rsbl_log.log");
+    rsbl::LogInit("test_rsbl_log.log");
 
-    if (g_rsbl_logger == nullptr)
+    if (rsbl::g_logger == nullptr)
     {
         printf("FAILED: Logger initialization returned nullptr\n");
         return 1;
     }
 
     // Verify logger is accessible
-    if (g_rsbl_logger != nullptr)
+    if (rsbl::g_logger != nullptr)
     {
         printf("PASSED: Logger initialized successfully\n");
     }

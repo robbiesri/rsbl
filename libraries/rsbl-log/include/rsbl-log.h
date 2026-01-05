@@ -14,7 +14,8 @@
 #include "quill/LogMacros.h"
 #include "quill/Logger.h"
 
-// TODO: move init function into rsbl namespace (global logger too?)
+namespace rsbl
+{
 
 /**
  * @brief Initialize the rsbl logging system with console and rotating file sinks.
@@ -24,22 +25,24 @@
  *
  * @param log_file_path Path to the rotating log file
  */
-void rsbl_log_init(const char* log_file_path);
+void LogInit(const char* log_file_path);
 
 /**
  * @brief Global logger instance for convenient logging throughout the application.
  *
- * This logger is initialized by rsbl_log_init() and configured with both console
+ * This logger is initialized by LogInit() and configured with both console
  * and rotating file sinks.
  */
-extern quill::Logger* g_rsbl_logger;
+extern quill::Logger* g_logger;
+
+} // namespace rsbl
 
 // Convenience macros that use the global logger to simplify usage
-#define RSBL_LOG_TRACE_L3(fmt, ...) QUILL_LOG_TRACE_L3(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_TRACE_L2(fmt, ...) QUILL_LOG_TRACE_L2(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_TRACE_L1(fmt, ...) QUILL_LOG_TRACE_L1(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_DEBUG(fmt, ...) QUILL_LOG_DEBUG(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_INFO(fmt, ...) QUILL_LOG_INFO(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_WARNING(fmt, ...) QUILL_LOG_WARNING(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_ERROR(fmt, ...) QUILL_LOG_ERROR(g_rsbl_logger, fmt, __VA_ARGS__)
-#define RSBL_LOG_CRITICAL(fmt, ...) QUILL_LOG_CRITICAL(g_rsbl_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_TRACE_L3(fmt, ...) QUILL_LOG_TRACE_L3(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_TRACE_L2(fmt, ...) QUILL_LOG_TRACE_L2(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_TRACE_L1(fmt, ...) QUILL_LOG_TRACE_L1(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_DEBUG(fmt, ...) QUILL_LOG_DEBUG(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_INFO(fmt, ...) QUILL_LOG_INFO(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_WARNING(fmt, ...) QUILL_LOG_WARNING(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_ERROR(fmt, ...) QUILL_LOG_ERROR(rsbl::g_logger, fmt, __VA_ARGS__)
+#define RSBL_LOG_CRITICAL(fmt, ...) QUILL_LOG_CRITICAL(rsbl::g_logger, fmt, __VA_ARGS__)

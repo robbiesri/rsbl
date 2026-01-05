@@ -9,10 +9,13 @@
 #include "quill/sinks/ConsoleSink.h"
 #include "quill/sinks/RotatingFileSink.h"
 
-// Global static logger instance owned by wrapper library
-quill::Logger* g_rsbl_logger = nullptr;
+namespace rsbl
+{
 
-void rsbl_log_init(const char* log_file_path)
+// Global static logger instance owned by wrapper library
+quill::Logger* g_logger = nullptr;
+
+void LogInit(const char* log_file_path)
 {
     // Start the backend thread
     quill::Backend::start();
@@ -46,7 +49,9 @@ void rsbl_log_init(const char* log_file_path)
         }());
 
     // Create logger with both console and rotating file sinks
-    g_rsbl_logger = quill::Frontend::create_or_get_logger(
+    g_logger = quill::Frontend::create_or_get_logger(
         "rsbl_root",
         {console_sink, rotating_file_sink});
 }
+
+} // namespace rsbl

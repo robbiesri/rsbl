@@ -102,7 +102,7 @@ void print_gltf_stats(const fastgltf::Asset& asset)
 
 int main(int argc, char** argv)
 {
-    rsbl_log_init("logs/gltf_viewer.log");
+    rsbl::LogInit("logs/gltf_viewer.log");
 
     CLI::App app("GLTF viewer");
 
