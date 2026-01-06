@@ -3,6 +3,8 @@
 
 #include "rsbl-window.h"
 
+#include <rsbl-log.h>
+
 #include <windows.h>
 
 // TODO: Should I consider using CS_CLASSDC or CS_OWNDC in WNDCLASSEXA::style? I'm always confused
@@ -45,6 +47,8 @@ static Result<> RegisterWindowClass()
     {
         return "Failed to register window class";
     }
+
+    RSBL_LOG_INFO("RSBLWindowClass registered successfully");
 
     s_windowClassRegistered = true;
     return ResultCode::Success;
@@ -196,6 +200,8 @@ Result<UniquePtr<Window>> Window::Create(uint2 size, int2 position)
 
     window->Show();
 
+    RSBL_LOG_INFO("rsbl::Window created with HWND {}", static_cast<void*>(hwnd));
+
     return UniquePtr(window);
 }
 
@@ -213,6 +219,7 @@ Window::~Window()
         HWND hwnd = static_cast<HWND>(m_platformData.platform_handle);
         DestroyWindow(hwnd);
         m_platformData.platform_handle = nullptr;
+        RSBL_LOG_INFO("rsbl::Window torn down - HWND {}", static_cast<void*>(hwnd));
     }
 }
 

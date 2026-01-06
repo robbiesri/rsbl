@@ -3,6 +3,8 @@
 
 #include "rsbl-thread.h"
 
+#include <rsbl-log.h>
+
 #include <windows.h>
 
 #include <cstring> // For strncpy_s
@@ -186,6 +188,8 @@ Result<ThreadNativeData> Thread::CreatePlatformThread(Thread* thread_obj)
     {
         return "Failed to create thread";
     }
+
+    RSBL_LOG_INFO("rsbl::Thread created with thread_id {}", thread_id);
 
     ThreadNativeData data;
     data.platform_handle = handle;
