@@ -3,6 +3,7 @@
 
 #include "rsbl-ga-backends.h"
 
+#include <rsbl-log.h>
 #include <rsbl-ptr.h>
 
 #include <d3d12.h>
@@ -29,20 +30,25 @@ namespace backend
 
         ~DX12Device() override
         {
+            RSBL_LOG_INFO("Destroying DX12 device...");
+
             if (d3d12Device)
             {
+                RSBL_LOG_INFO("Releasing ID3D12Device: {}", static_cast<void*>(d3d12Device));
                 d3d12Device->Release();
                 d3d12Device = nullptr;
             }
 
             if (adapter)
             {
+                RSBL_LOG_INFO("Releasing DXGIAdapter: {}", static_cast<void*>(adapter));
                 adapter->Release();
                 adapter = nullptr;
             }
 
             if (dxgiFactory)
             {
+                RSBL_LOG_INFO("Releasing DXGIFactory: {}", static_cast<void*>(dxgiFactory));
                 dxgiFactory->Release();
                 dxgiFactory = nullptr;
             }
@@ -51,6 +57,8 @@ namespace backend
 
     Result<gaDevice*> CreateDX12Device(const gaDeviceCreateInfo& createInfo)
     {
+        RSBL_LOG_INFO("Creating DX12 device...");
+
         auto device = rsbl::UniquePtr(new DX12Device());
 
         // Enable debug layer if validation is requested
@@ -76,6 +84,8 @@ namespace backend
         {
             return "Failed to create DXGI factory";
         }
+
+        RSBL_LOG_INFO("DXGI factory created: {}", static_cast<void*>(device->dxgiFactory));
 
         // Find hardware adapter
         IDXGIAdapter1* adapter = nullptr;
@@ -109,6 +119,8 @@ namespace backend
             return "Failed to find suitable graphics adapter";
         }
 
+        RSBL_LOG_INFO("Found suitable graphics adapter: {}", static_cast<void*>(device->adapter));
+
         // Create D3D12 device
         hr = D3D12CreateDevice(
             device->adapter, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&device->d3d12Device));
@@ -117,6 +129,8 @@ namespace backend
         {
             return "Failed to create D3D12 device";
         }
+
+        RSBL_LOG_INFO("D3D12 device created: {}", static_cast<void*>(device->d3d12Device));
 
         device->internalHandle = device->d3d12Device;
 

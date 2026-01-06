@@ -4,6 +4,7 @@
 #include "rsbl-ga-backends.h"
 
 #include <rsbl-dynamic-array.h>
+#include <rsbl-log.h>
 #include <rsbl-ptr.h>
 
 #include <vulkan/vulkan.h>
@@ -33,8 +34,11 @@ namespace backend
 
         ~VulkanDevice() override
         {
+            RSBL_LOG_INFO("Destroying Vulkan device...");
+
             if (logicalDevice != VK_NULL_HANDLE)
             {
+                RSBL_LOG_INFO("Destroying VkDevice: {}", static_cast<void*>(logicalDevice));
                 vkDestroyDevice(logicalDevice, nullptr);
                 logicalDevice = VK_NULL_HANDLE;
             }
@@ -53,6 +57,7 @@ namespace backend
 
             if (instance != VK_NULL_HANDLE)
             {
+                RSBL_LOG_INFO("Destroying VkInstance: {}", static_cast<void*>(instance));
                 vkDestroyInstance(instance, nullptr);
                 instance = VK_NULL_HANDLE;
             }
@@ -61,6 +66,7 @@ namespace backend
 
     Result<gaDevice*> CreateVulkanDevice(const gaDeviceCreateInfo& createInfo)
     {
+        RSBL_LOG_INFO("Creating Vulkan device...");
         auto device = rsbl::UniquePtr(new VulkanDevice());
 
         // Application info
@@ -92,6 +98,8 @@ namespace backend
             return "Failed to create Vulkan instance";
         }
 
+        RSBL_LOG_INFO("Vulkan instance created: {}", static_cast<void*>(device->instance));
+
         // Select physical device
         uint32 deviceCount = 0;
         vkEnumeratePhysicalDevices(device->instance, &deviceCount, nullptr);
@@ -100,6 +108,8 @@ namespace backend
         {
             return "Failed to find GPUs with Vulkan support";
         }
+
+        RSBL_LOG_INFO("Found {} GPUs with Vulkan support", deviceCount);
 
         rsbl::DynamicArray<VkPhysicalDevice> physicalDevices(deviceCount);
         vkEnumeratePhysicalDevices(device->instance, &deviceCount, physicalDevices.Data());
@@ -133,6 +143,8 @@ namespace backend
             return "Failed to find graphics queue family";
         }
 
+        RSBL_LOG_INFO("Found graphics queue family {}", graphicsQueueFamilyIndex);
+
         // Create logical device
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -156,6 +168,9 @@ namespace backend
         {
             return "Failed to create Vulkan logical device";
         }
+
+        RSBL_LOG_INFO("Vulkan logical device created: {}",
+                      static_cast<void*>(device->logicalDevice));
 
         device->internalHandle = device->logicalDevice;
 
