@@ -8,7 +8,7 @@ namespace rsbl
 namespace backend
 {
 
-Result<gaDevice*> createVulkanDevice(const gaDeviceCreateInfo& createInfo)
+Result<gaDevice*> CreateVulkanDevice(const gaDeviceCreateInfo& createInfo)
 {
 	return "Vulkan backend is not available. Install Vulkan SDK and reconfigure CMake";
 }
