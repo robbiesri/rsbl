@@ -5,6 +5,7 @@
 
 #include <rsbl-log.h>
 #include <rsbl-ptr.h>
+#include <rsbl-dynamic-array.h>
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -21,6 +22,7 @@ namespace backend
         ID3D12Device* d3d12Device = nullptr;
         IDXGIFactory4* dxgiFactory = nullptr;
         IDXGIAdapter1* adapter = nullptr;
+        DynamicArray<ID3D12CommandQueue*> commandQueues;
 
         DX12Device()
         {
@@ -31,6 +33,17 @@ namespace backend
         ~DX12Device() override
         {
             RSBL_LOG_INFO("Destroying DX12 device...");
+
+            // Release command queues first
+            for (size_t i = 0; i < commandQueues.Size(); ++i)
+            {
+                if (commandQueues[i])
+                {
+                    RSBL_LOG_INFO("Releasing ID3D12CommandQueue: {}", static_cast<void*>(commandQueues[i]));
+                    commandQueues[i]->Release();
+                }
+            }
+            commandQueues.Clear();
 
             if (d3d12Device)
             {
@@ -133,6 +146,23 @@ namespace backend
         RSBL_LOG_INFO("D3D12 device created: {}", static_cast<void*>(device->d3d12Device));
 
         device->internalHandle = device->d3d12Device;
+
+        // Create command queue
+        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        queueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        queueDesc.NodeMask = 0;
+
+        ID3D12CommandQueue* commandQueue = nullptr;
+        hr = device->d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
+        if (FAILED(hr))
+        {
+            return "Failed to create command queue";
+        }
+
+        RSBL_LOG_INFO("Command queue created: {}", static_cast<void*>(commandQueue));
+        device->commandQueues.PushBack(commandQueue);
 
         return device.Release();
     }

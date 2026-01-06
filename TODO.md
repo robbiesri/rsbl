@@ -34,15 +34,15 @@
 
 ## Logger Wrapper
 
-[ ] Create new static library rsbl-log that will wrap quill logging library (quill::quill as public dependency)
-[ ] Add rsbl-log as dependency to rsbl-core
-[ ] Library public header provides logger init and extern to global logger instance
-[ ] Init takes `const char *` which represents filename path to rotating file sink
-[ ] Init sets up console sink and rotating file sink, starts backend, and creates logger from frontend with two sinks
-[ ] Public header exposes `quill/LogMacros.h` and `quill/Logger.h`
-[ ] Include quill backend header in static library rsbl-log.cpp
-[ ] Global static logger instance owned by wrapper library
-[ ] Expose new logger macros that use global logger to simplify logger usage
+[x] Create new static library rsbl-log that will wrap quill logging library (quill::quill as public dependency)
+[x] Add rsbl-log as dependency to rsbl-core
+[x] Library public header provides logger init and extern to global logger instance
+[x] Init takes `const char *` which represents filename path to rotating file sink
+[x] Init sets up console sink and rotating file sink, starts backend, and creates logger from frontend with two sinks
+[x] Public header exposes `quill/LogMacros.h` and `quill/Logger.h`
+[x] Include quill backend header in static library rsbl-log.cpp
+[x] Global static logger instance owned by wrapper library
+[x] Expose new logger macros that use global logger to simplify logger usage
 
 ## General Systems
 
