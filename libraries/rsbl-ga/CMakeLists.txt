@@ -25,6 +25,7 @@ else ()
 endif ()
 
 # Try to find Vulkan SDK
+message(STATUS "VULKAN_SDK environment variable value: $ENV{VULKAN_SDK}")
 find_package(Vulkan QUIET)
 
 # Add Vulkan backend only if SDK is found
