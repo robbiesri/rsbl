@@ -5,6 +5,7 @@ list(APPEND PUBLIC_HEADER_FILES
         include/rsbl-assert.h
         include/rsbl-core.h
         include/rsbl-dynamic-array.h
+        include/rsbl-fixed-array.h
         include/rsbl-function.h
         include/rsbl-int-types.h
         include/rsbl-math-types.h
@@ -37,6 +38,7 @@ rsbl_add_tests(
         SOURCES
         rsbl-result.test.cpp
         rsbl-dynamic-array.test.cpp
+        rsbl-fixed-array.test.cpp
         rsbl-math.test.cpp
         rsbl-ptr.test.cpp
         rsbl-function.test.cpp
