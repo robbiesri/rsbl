@@ -23,6 +23,7 @@ namespace backend
         IDXGIFactory4* dxgiFactory = nullptr;
         IDXGIAdapter1* adapter = nullptr;
         DynamicArray<ID3D12CommandQueue*> commandQueues;
+        uint32 rtvDescriptorSize = 0;
 
         DX12Device()
         {
@@ -146,6 +147,11 @@ namespace backend
         RSBL_LOG_INFO("D3D12 device created: {}", static_cast<void*>(device->d3d12Device));
 
         device->internalHandle = device->d3d12Device;
+
+        // Cache RTV descriptor size for later use
+        device->rtvDescriptorSize =
+            device->d3d12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+        RSBL_LOG_INFO("RTV descriptor size: {}", device->rtvDescriptorSize);
 
         // Create command queue
         D3D12_COMMAND_QUEUE_DESC queueDesc = {};
