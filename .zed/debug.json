@@ -1,0 +1,17 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "label": "Debug gltf-viewer",
+    //    "build": {
+    //      "command": "$ZED_WORKTREE_ROOT/scripts/setup_build.bat",
+    //      "args": [],
+    //      "cwd": "$ZED_WORKTREE_ROOT",
+    //    },
+    "program": "$ZED_WORKTREE_ROOT/cmake-test-ninja/bin/gltf-viewer.exe", // Replace with the path to your executable
+    "request": "launch",
+    "adapter": "CodeLLDB",
+  },
+]
