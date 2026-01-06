@@ -177,5 +177,11 @@ namespace backend
         return device.Release();
     }
 
+    Result<gaSwapchain*> CreateVulkanSwapchain(const gaSwapchainCreateInfo& createInfo)
+    {
+        // TODO: Implement Vulkan swapchain creation
+        return "Vulkan swapchain creation not yet implemented";
+    }
+
 } // namespace backend
 } // namespace rsbl

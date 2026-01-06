@@ -33,7 +33,27 @@ struct gaDevice
     virtual ~gaDevice() = default;
 };
 
+struct gaSwapchainCreateInfo
+{
+    gaDevice* device;
+    void* appHandle;    // Platform-specific application handle (HINSTANCE on Windows)
+    void* windowHandle; // Platform-specific window handle (HWND on Windows)
+    uint32 width;       // Window client width
+    uint32 height;      // Window client height
+};
+
+struct gaSwapchain
+{
+    gaBackend backend;
+    void* internalHandle; // Backend-specific swapchain handle
+
+    virtual ~gaSwapchain() = default;
+};
+
 Result<gaDevice*> GaCreateDevice(const gaDeviceCreateInfo& createInfo);
 void GaDestroyDevice(gaDevice* device);
+
+Result<gaSwapchain*> GaCreateSwapchain(const gaSwapchainCreateInfo& createInfo);
+void GaDestroySwapchain(gaSwapchain* swapchain);
 
 } // namespace rsbl

@@ -13,5 +13,10 @@ Result<gaDevice*> CreateDX12Device(const gaDeviceCreateInfo& createInfo)
 	return "DX12 backend is not available. Build with MSVC to enable DX12 support";
 }
 
+Result<gaSwapchain*> CreateDX12Swapchain(const gaSwapchainCreateInfo& createInfo)
+{
+	return "DX12 backend is not available. Build with MSVC to enable DX12 support";
+}
+
 } // namespace backend
 } // namespace rsbl

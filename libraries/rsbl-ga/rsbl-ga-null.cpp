@@ -22,11 +22,48 @@ struct NullDevice : public gaDevice
 	}
 };
 
+struct NullSwapchain : public gaSwapchain
+{
+	NullSwapchain()
+	{
+		backend = gaBackend::Null;
+		internalHandle = nullptr;
+	}
+
+	~NullSwapchain() override
+	{
+		// No cleanup needed for null backend
+	}
+};
+
 Result<gaDevice*> CreateNullDevice(const gaDeviceCreateInfo& createInfo)
 {
 	// Null backend always succeeds and validates API usage
 	NullDevice* device = new NullDevice();
 	return device;
+}
+
+Result<gaSwapchain*> CreateNullSwapchain(const gaSwapchainCreateInfo& createInfo)
+{
+	// Validate create info
+	if (createInfo.width == 0)
+	{
+		return "Swapchain width must be greater than zero";
+	}
+
+	if (createInfo.height == 0)
+	{
+		return "Swapchain height must be greater than zero";
+	}
+
+	if (createInfo.appHandle == nullptr && createInfo.windowHandle == nullptr)
+	{
+		return "At least one of appHandle or windowHandle must be non-null";
+	}
+
+	// Null backend always succeeds and validates API usage
+	NullSwapchain* swapchain = new NullSwapchain();
+	return swapchain;
 }
 
 } // namespace backend

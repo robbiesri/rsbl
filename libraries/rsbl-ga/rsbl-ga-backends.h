@@ -17,5 +17,9 @@ namespace backend
     Result<gaDevice*> CreateDX12Device(const gaDeviceCreateInfo& createInfo);
     Result<gaDevice*> CreateVulkanDevice(const gaDeviceCreateInfo& createInfo);
 
+    Result<gaSwapchain*> CreateNullSwapchain(const gaSwapchainCreateInfo& createInfo);
+    Result<gaSwapchain*> CreateDX12Swapchain(const gaSwapchainCreateInfo& createInfo);
+    Result<gaSwapchain*> CreateVulkanSwapchain(const gaSwapchainCreateInfo& createInfo);
+
 } // namespace backend
 } // namespace rsbl

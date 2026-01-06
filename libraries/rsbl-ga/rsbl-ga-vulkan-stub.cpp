@@ -13,5 +13,10 @@ Result<gaDevice*> CreateVulkanDevice(const gaDeviceCreateInfo& createInfo)
 	return "Vulkan backend is not available. Install Vulkan SDK and reconfigure CMake";
 }
 
+Result<gaSwapchain*> CreateVulkanSwapchain(const gaSwapchainCreateInfo& createInfo)
+{
+	return "Vulkan backend is not available. Install Vulkan SDK and reconfigure CMake";
+}
+
 } // namespace backend
 } // namespace rsbl
