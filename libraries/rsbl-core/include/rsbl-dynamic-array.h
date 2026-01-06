@@ -216,6 +216,37 @@ class DynamicArray
         }
     }
 
+    // Resize array to new size
+    // If newSize < current size, excess elements are destroyed
+    // If newSize > current size, new elements are default-constructed
+    void Resize(uint64 newSize)
+    {
+        if (newSize < m_size)
+        {
+            // Destroy excess elements
+            for (uint64 i = newSize; i < m_size; ++i)
+            {
+                m_data[i].~T();
+            }
+            m_size = newSize;
+        }
+        else if (newSize > m_size)
+        {
+            // Grow capacity if needed
+            if (newSize > m_capacity)
+            {
+                Grow(newSize);
+            }
+
+            // Default-construct new elements
+            for (uint64 i = m_size; i < newSize; ++i)
+            {
+                new (&m_data[i]) T();
+            }
+            m_size = newSize;
+        }
+    }
+
     // Clear all elements
     void Clear()
     {
