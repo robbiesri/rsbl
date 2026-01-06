@@ -4,6 +4,7 @@
 #include "rsbl-ga-backends.h"
 
 #include <rsbl-dynamic-array.h>
+#include <rsbl-fixed-array.h>
 #include <rsbl-log.h>
 #include <rsbl-ptr.h>
 
@@ -137,23 +138,23 @@ namespace backend
         appInfo.apiVersion = VK_API_VERSION_1_3;
 
         // Instance extensions for surface support
-        const char* instanceExtensions[] = {VK_KHR_SURFACE_EXTENSION_NAME,
-                                            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-                                            VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME};
+        FixedArray instanceExtensions = {VK_KHR_SURFACE_EXTENSION_NAME,
+                                         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+                                         VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME};
 
         // Instance create info
         VkInstanceCreateInfo instanceCreateInfo{};
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instanceCreateInfo.pApplicationInfo = &appInfo;
-        instanceCreateInfo.enabledExtensionCount = 3;
-        instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions;
+        instanceCreateInfo.enabledExtensionCount = static_cast<uint32>(instanceExtensions.Size());
+        instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.Data();
 
         // Validation layers
-        const char* validationLayers[] = {"VK_LAYER_KHRONOS_validation"};
+        FixedArray validationLayers = {"VK_LAYER_KHRONOS_validation"};
         if (createInfo.enableValidation)
         {
-            instanceCreateInfo.enabledLayerCount = 1;
-            instanceCreateInfo.ppEnabledLayerNames = validationLayers;
+            instanceCreateInfo.enabledLayerCount = static_cast<uint32>(validationLayers.Size());
+            instanceCreateInfo.ppEnabledLayerNames = validationLayers.Data();
         }
 
         // Create instance
@@ -213,9 +214,9 @@ namespace backend
 
         // Device extensions for swapchain support
         // These extensions are expected to be available in Vulkan 1.3
-        const char* deviceExtensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-                                          VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME,
-                                          VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME};
+        FixedArray deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                       VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME,
+                                       VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME};
 
         // Create logical device
         VkDeviceQueueCreateInfo queueCreateInfo{};
@@ -232,8 +233,8 @@ namespace backend
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
-        deviceCreateInfo.enabledExtensionCount = 3;
-        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
+        deviceCreateInfo.enabledExtensionCount = static_cast<uint32>(deviceExtensions.Size());
+        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.Data();
         // deviceCreateInfo.flags = 0; // flags not needed currently, according to spec
 
         result = vkCreateDevice(
@@ -421,7 +422,7 @@ namespace backend
             "Swapchain extent: {}x{}, image count: {}", extent.width, extent.height, imageCount);
 
         // Create swapchain
-        uint32 queueFamilyIndices[] = {vulkanDevice->graphicsQueueFamilyIndex};
+        FixedArray queueFamilyIndices = {vulkanDevice->graphicsQueueFamilyIndex};
 
         VkSwapchainCreateInfoKHR swapchainCreateInfo{};
         swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -433,8 +434,8 @@ namespace backend
         swapchainCreateInfo.imageArrayLayers = 1;
         swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        swapchainCreateInfo.queueFamilyIndexCount = 1;
-        swapchainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
+        swapchainCreateInfo.queueFamilyIndexCount = static_cast<uint32>(queueFamilyIndices.Size());
+        swapchainCreateInfo.pQueueFamilyIndices = queueFamilyIndices.Data();
         swapchainCreateInfo.preTransform = capabilities.currentTransform;
         swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         swapchainCreateInfo.presentMode = presentMode;
