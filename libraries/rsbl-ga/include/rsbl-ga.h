@@ -6,6 +6,7 @@
 #include <rsbl-result.h>
 
 // TODO: check for async compute during device creation?
+// TODO: swapchain image count in gaSwapchainCreateInfo
 
 namespace rsbl
 {

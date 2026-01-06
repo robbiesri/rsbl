@@ -9,10 +9,17 @@
 
 #include <vulkan/vulkan.h>
 
+#if defined(WIN32)
+    #include <windows.h>
+
+    #include <vulkan/vulkan_win32.h>
+#endif
+
 // TODO: Convert gaDeviceCreateInfo::appVersion to engineVersion
 // TODO: Process to reasonably select device
 // TODO: set up VkDebugUtilsMessengerEXT
 // TODO: Query instance + device layers, check against requests
+// TODO: do I really need graphicsQueueFamilyIndex stored in VulkanDevice?
 
 namespace rsbl
 {
@@ -25,6 +32,7 @@ namespace backend
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
         VkDevice logicalDevice = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
+
         uint32 graphicsQueueFamilyIndex = 0;
 
         VulkanDevice()
@@ -89,7 +97,9 @@ namespace backend
             {
                 if (swapchainImageViews[i] != VK_NULL_HANDLE)
                 {
-                    RSBL_LOG_INFO("Destroying VkImageView {}: {}", i, static_cast<void*>(swapchainImageViews[i]));
+                    RSBL_LOG_INFO("Destroying VkImageView {}: {}",
+                                  i,
+                                  static_cast<void*>(swapchainImageViews[i]));
                     vkDestroyImageView(device, swapchainImageViews[i], nullptr);
                 }
             }
@@ -127,11 +137,9 @@ namespace backend
         appInfo.apiVersion = VK_API_VERSION_1_3;
 
         // Instance extensions for surface support
-        const char* instanceExtensions[] = {
-            VK_KHR_SURFACE_EXTENSION_NAME,
-            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-            VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME
-        };
+        const char* instanceExtensions[] = {VK_KHR_SURFACE_EXTENSION_NAME,
+                                            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+                                            VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME};
 
         // Instance create info
         VkInstanceCreateInfo instanceCreateInfo{};
@@ -205,11 +213,9 @@ namespace backend
 
         // Device extensions for swapchain support
         // These extensions are expected to be available in Vulkan 1.3
-        const char* deviceExtensions[] = {
-            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-            VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME,
-            VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME
-        };
+        const char* deviceExtensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                          VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME,
+                                          VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME};
 
         // Create logical device
         VkDeviceQueueCreateInfo queueCreateInfo{};
@@ -287,11 +293,10 @@ namespace backend
 
         // Check if queue family supports presentation
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(
-            vulkanDevice->physicalDevice,
-            vulkanDevice->graphicsQueueFamilyIndex,
-            swapchain->surface,
-            &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(vulkanDevice->physicalDevice,
+                                             vulkanDevice->graphicsQueueFamilyIndex,
+                                             swapchain->surface,
+                                             &presentSupport);
 
         if (!presentSupport)
         {
@@ -363,8 +368,10 @@ namespace backend
         }
 
         DynamicArray<VkPresentModeKHR> presentModes(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(
-            vulkanDevice->physicalDevice, swapchain->surface, &presentModeCount, presentModes.Data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(vulkanDevice->physicalDevice,
+                                                  swapchain->surface,
+                                                  &presentModeCount,
+                                                  presentModes.Data());
 
         // Choose present mode (prefer MAILBOX, fallback to FIFO which is always available)
         VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
@@ -392,15 +399,15 @@ namespace backend
 
             // Clamp to supported range
             extent.width = extent.width < capabilities.minImageExtent.width
-                ? capabilities.minImageExtent.width
-                : (extent.width > capabilities.maxImageExtent.width
-                    ? capabilities.maxImageExtent.width
-                    : extent.width);
+                               ? capabilities.minImageExtent.width
+                               : (extent.width > capabilities.maxImageExtent.width
+                                      ? capabilities.maxImageExtent.width
+                                      : extent.width);
             extent.height = extent.height < capabilities.minImageExtent.height
-                ? capabilities.minImageExtent.height
-                : (extent.height > capabilities.maxImageExtent.height
-                    ? capabilities.maxImageExtent.height
-                    : extent.height);
+                                ? capabilities.minImageExtent.height
+                                : (extent.height > capabilities.maxImageExtent.height
+                                       ? capabilities.maxImageExtent.height
+                                       : extent.height);
         }
 
         // Determine image count (use min + 1, but don't exceed max)
@@ -410,11 +417,11 @@ namespace backend
             imageCount = capabilities.maxImageCount;
         }
 
-        RSBL_LOG_INFO("Swapchain extent: {}x{}, image count: {}",
-                      extent.width, extent.height, imageCount);
+        RSBL_LOG_INFO(
+            "Swapchain extent: {}x{}, image count: {}", extent.width, extent.height, imageCount);
 
         // Create swapchain
-        uint32 queueFamilyIndices[] = { vulkanDevice->graphicsQueueFamilyIndex };
+        uint32 queueFamilyIndices[] = {vulkanDevice->graphicsQueueFamilyIndex};
 
         VkSwapchainCreateInfoKHR swapchainCreateInfo{};
         swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -451,9 +458,10 @@ namespace backend
             vulkanDevice->logicalDevice, swapchain->swapchain, &actualImageCount, nullptr);
 
         swapchain->swapchainImages.Resize(actualImageCount);
-        vkGetSwapchainImagesKHR(
-            vulkanDevice->logicalDevice, swapchain->swapchain,
-            &actualImageCount, swapchain->swapchainImages.Data());
+        vkGetSwapchainImagesKHR(vulkanDevice->logicalDevice,
+                                swapchain->swapchain,
+                                &actualImageCount,
+                                swapchain->swapchainImages.Data());
 
         RSBL_LOG_INFO("Retrieved {} swapchain images", actualImageCount);
 
@@ -476,16 +484,18 @@ namespace backend
             imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
             imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-            result = vkCreateImageView(
-                vulkanDevice->logicalDevice, &imageViewCreateInfo, nullptr,
-                &swapchain->swapchainImageViews[i]);
+            result = vkCreateImageView(vulkanDevice->logicalDevice,
+                                       &imageViewCreateInfo,
+                                       nullptr,
+                                       &swapchain->swapchainImageViews[i]);
 
             if (result != VK_SUCCESS)
             {
                 return "Failed to create image view";
             }
 
-            RSBL_LOG_INFO("Image view {} created: {}", i,
+            RSBL_LOG_INFO("Image view {} created: {}",
+                          i,
                           static_cast<void*>(swapchain->swapchainImageViews[i]));
         }
 
