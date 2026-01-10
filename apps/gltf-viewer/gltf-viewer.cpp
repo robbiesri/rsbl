@@ -3,6 +3,7 @@
 
 #include <rsbl-ga.h>
 #include <rsbl-log.h>
+#include <rsbl-platform.h>
 #include <rsbl-ptr.h>
 #include <rsbl-window.h>
 
@@ -11,10 +12,6 @@
 #include <fastgltf/types.hpp>
 
 #include <string>
-
-#ifdef _WIN32
-    #include <windows.h>
-#endif
 
 void print_gltf_stats(const fastgltf::Asset& asset)
 {
@@ -197,9 +194,7 @@ int main(int argc, char** argv)
 
     rsbl::gaSwapchainCreateInfo swapchain_info{};
     swapchain_info.device = device;
-#ifdef _WIN32
-    swapchain_info.appHandle = GetModuleHandle(nullptr);
-#endif
+    swapchain_info.appHandle = rsbl::GetApplicationHandle();
     swapchain_info.windowHandle = window->GetNativeData().platform_handle;
     const rsbl::uint2 window_size = window->Size();
     swapchain_info.width = window_size.x;
