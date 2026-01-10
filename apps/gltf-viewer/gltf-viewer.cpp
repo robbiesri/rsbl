@@ -199,6 +199,7 @@ int main(int argc, char** argv)
     const rsbl::uint2 window_size = window->Size();
     swapchain_info.width = window_size.x;
     swapchain_info.height = window_size.y;
+    swapchain_info.bufferCount = 2; // this is the default, but let's be explicit
 
     if (auto swapchain_result = rsbl::GaCreateSwapchain(swapchain_info))
     {

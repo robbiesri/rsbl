@@ -245,7 +245,7 @@ namespace backend
         swapchainDesc.SampleDesc.Count = 1;
         swapchainDesc.SampleDesc.Quality = 0;
         swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swapchainDesc.BufferCount = 2; // Double buffering
+        swapchainDesc.BufferCount = createInfo.bufferCount;
         swapchainDesc.Scaling = DXGI_SCALING_STRETCH;
         swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swapchainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;

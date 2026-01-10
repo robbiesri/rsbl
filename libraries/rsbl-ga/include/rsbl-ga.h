@@ -6,7 +6,6 @@
 #include <rsbl-result.h>
 
 // TODO: check for async compute during device creation?
-// TODO: swapchain image count in gaSwapchainCreateInfo
 
 namespace rsbl
 {
@@ -41,6 +40,7 @@ struct gaSwapchainCreateInfo
     void* windowHandle; // Platform-specific window handle (HWND on Windows)
     uint32 width;       // Window client width
     uint32 height;      // Window client height
+    uint32 bufferCount = 2; // Number of swapchain buffers (typically 2-4)
 };
 
 struct gaSwapchain

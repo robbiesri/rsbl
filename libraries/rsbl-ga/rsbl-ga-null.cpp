@@ -56,6 +56,11 @@ Result<gaSwapchain*> CreateNullSwapchain(const gaSwapchainCreateInfo& createInfo
 		return "Swapchain height must be greater than zero";
 	}
 
+	if (createInfo.bufferCount < 2 || createInfo.bufferCount > 4)
+	{
+		return "Swapchain buffer count must be between 2 and 4";
+	}
+
 	if (createInfo.appHandle == nullptr && createInfo.windowHandle == nullptr)
 	{
 		return "At least one of appHandle or windowHandle must be non-null";

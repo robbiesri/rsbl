@@ -411,10 +411,20 @@ namespace backend
                                        : extent.height);
         }
 
-        // Determine image count (use min + 1, but don't exceed max)
-        uint32 imageCount = capabilities.minImageCount + 1;
+        // Determine image count (use requested count, but respect surface capabilities)
+        uint32 imageCount = createInfo.bufferCount;
+        if (imageCount < capabilities.minImageCount)
+        {
+            RSBL_LOG_WARNING("Requested buffer count {} is less than minimum {}, using minimum",
+                             createInfo.bufferCount,
+                             capabilities.minImageCount);
+            imageCount = capabilities.minImageCount;
+        }
         if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount)
         {
+            RSBL_LOG_WARNING("Requested buffer count {} exceeds maximum {}, using maximum",
+                             createInfo.bufferCount,
+                             capabilities.maxImageCount);
             imageCount = capabilities.maxImageCount;
         }
 
