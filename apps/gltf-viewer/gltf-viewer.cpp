@@ -104,12 +104,25 @@ int main(int argc, char** argv)
 {
     rsbl::LogInit("logs/gltf_viewer.log");
 
-    CLI::App app("GLTF viewer");
+    CLI::App app("GLTF viewer - A real-time glTF renderer supporting D3D12, Vulkan, and Null backends");
 
     std::string file_path;
     app.add_option("-f,--file", file_path, "GLTF file path")->required()->check(CLI::ExistingFile);
 
+    std::string backend_str = "d3d12";  // Default to D3D12
+    app.add_option("-b,--backend", backend_str, "Graphics backend (d3d12, vulkan, or null)")
+        ->check(CLI::IsMember({"d3d12", "vulkan", "null"}));
+
     CLI11_PARSE(app, argc, argv);
+
+    // Convert backend string to enum
+    rsbl::gaBackend selected_backend = rsbl::gaBackend::DX12;  // Default
+    if (backend_str == "d3d12")
+        selected_backend = rsbl::gaBackend::DX12;
+    else if (backend_str == "vulkan")
+        selected_backend = rsbl::gaBackend::Vulkan;
+    else if (backend_str == "null")
+        selected_backend = rsbl::gaBackend::Null;
 
     RSBL_LOG_INFO("Loading glTF file: {}", file_path);
 
@@ -156,31 +169,23 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    rsbl::gaDevice* dx12_device = nullptr;
-    rsbl::gaDevice* vulkan_device = nullptr;
+    rsbl::gaDevice* device = nullptr;
 
-    rsbl::gaDeviceCreateInfo create_info_dx12{};
-    create_info_dx12.backend = rsbl::gaBackend::DX12;
-    if (auto dx12_device_result = rsbl::GaCreateDevice(create_info_dx12))
+    rsbl::gaDeviceCreateInfo create_info{};
+    create_info.backend = selected_backend;
+
+    if (auto device_result = rsbl::GaCreateDevice(create_info))
     {
-        dx12_device = dx12_device_result.Value();
-        RSBL_LOG_INFO("DX12 device successfully created");
+        device = device_result.Value();
+        const char* backend_name =
+            selected_backend == rsbl::gaBackend::DX12 ? "DX12" :
+            selected_backend == rsbl::gaBackend::Vulkan ? "Vulkan" : "Null";
+        RSBL_LOG_INFO("Graphics device successfully created (backend: {})", backend_name);
     }
     else
     {
-        RSBL_LOG_WARNING("Failed to create DX12 device: {}", dx12_device_result.FailureText());
-    }
-
-    rsbl::gaDeviceCreateInfo create_info_vulkan{};
-    create_info_vulkan.backend = rsbl::gaBackend::Vulkan;
-    if (auto vulkan_device_result = rsbl::GaCreateDevice(create_info_vulkan))
-    {
-        vulkan_device = vulkan_device_result.Value();
-        RSBL_LOG_INFO("Vulkan device successfully created");
-    }
-    else
-    {
-        RSBL_LOG_WARNING("Failed to create Vulkan device: {}", vulkan_device_result.FailureText());
+        RSBL_LOG_ERROR("Failed to create graphics device: {}", device_result.FailureText());
+        return 1;  // Fatal error - can't continue without a device
     }
 
     while (window->ProcessMessages() != rsbl::WindowMessageResult::Quit)
@@ -194,8 +199,7 @@ int main(int argc, char** argv)
         }
     }
 
-    rsbl::GaDestroyDevice(dx12_device);
-    rsbl::GaDestroyDevice(vulkan_device);
+    rsbl::GaDestroyDevice(device);
 
     RSBL_LOG_INFO("Window closed, shutting down!");
 
