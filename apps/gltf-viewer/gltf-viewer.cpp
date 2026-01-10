@@ -12,6 +12,10 @@
 
 #include <string>
 
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
 void print_gltf_stats(const fastgltf::Asset& asset)
 {
     RSBL_LOG_INFO("");
@@ -104,19 +108,20 @@ int main(int argc, char** argv)
 {
     rsbl::LogInit("logs/gltf_viewer.log");
 
-    CLI::App app("GLTF viewer - A real-time glTF renderer supporting D3D12, Vulkan, and Null backends");
+    CLI::App app(
+        "GLTF viewer - A real-time glTF renderer supporting D3D12, Vulkan, and Null backends");
 
     std::string file_path;
     app.add_option("-f,--file", file_path, "GLTF file path")->required()->check(CLI::ExistingFile);
 
-    std::string backend_str = "d3d12";  // Default to D3D12
+    std::string backend_str = "d3d12"; // Default to D3D12
     app.add_option("-b,--backend", backend_str, "Graphics backend (d3d12, vulkan, or null)")
         ->check(CLI::IsMember({"d3d12", "vulkan", "null"}));
 
     CLI11_PARSE(app, argc, argv);
 
     // Convert backend string to enum
-    rsbl::gaBackend selected_backend = rsbl::gaBackend::DX12;  // Default
+    rsbl::gaBackend selected_backend = rsbl::gaBackend::DX12; // Default
     if (backend_str == "d3d12")
         selected_backend = rsbl::gaBackend::DX12;
     else if (backend_str == "vulkan")
@@ -177,15 +182,39 @@ int main(int argc, char** argv)
     if (auto device_result = rsbl::GaCreateDevice(create_info))
     {
         device = device_result.Value();
-        const char* backend_name =
-            selected_backend == rsbl::gaBackend::DX12 ? "DX12" :
-            selected_backend == rsbl::gaBackend::Vulkan ? "Vulkan" : "Null";
+        const char* backend_name = selected_backend == rsbl::gaBackend::DX12     ? "DX12"
+                                   : selected_backend == rsbl::gaBackend::Vulkan ? "Vulkan"
+                                                                                 : "Null";
         RSBL_LOG_INFO("Graphics device successfully created (backend: {})", backend_name);
     }
     else
     {
         RSBL_LOG_ERROR("Failed to create graphics device: {}", device_result.FailureText());
-        return 1;  // Fatal error - can't continue without a device
+        return 1; // Fatal error - can't continue without a device
+    }
+
+    rsbl::gaSwapchain* swapchain = nullptr;
+
+    rsbl::gaSwapchainCreateInfo swapchain_info{};
+    swapchain_info.device = device;
+#ifdef _WIN32
+    swapchain_info.appHandle = GetModuleHandle(nullptr);
+#endif
+    swapchain_info.windowHandle = window->GetNativeData().platform_handle;
+    const rsbl::uint2 window_size = window->Size();
+    swapchain_info.width = window_size.x;
+    swapchain_info.height = window_size.y;
+
+    if (auto swapchain_result = rsbl::GaCreateSwapchain(swapchain_info))
+    {
+        swapchain = swapchain_result.Value();
+        RSBL_LOG_INFO("Swapchain successfully created");
+    }
+    else
+    {
+        RSBL_LOG_ERROR("Failed to create swapchain: {}", swapchain_result.FailureText());
+        rsbl::GaDestroyDevice(device);
+        return 1; // Fatal error - can't continue without a swapchain
     }
 
     while (window->ProcessMessages() != rsbl::WindowMessageResult::Quit)
@@ -199,6 +228,7 @@ int main(int argc, char** argv)
         }
     }
 
+    rsbl::GaDestroySwapchain(swapchain);
     rsbl::GaDestroyDevice(device);
 
     RSBL_LOG_INFO("Window closed, shutting down!");
