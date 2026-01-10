@@ -45,14 +45,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 add_subdirectory(external/doctest)
 add_subdirectory(external/quill)
 
-# Disable warnings for quill (external dependency)
+# Treat quill headers as system headers to suppress warnings
 if (TARGET quill)
-    if (MSVC)
-        target_compile_options(quill INTERFACE /W0)
-    else ()
-        target_compile_options(quill INTERFACE -w)
-    endif ()
-endif ()
+    get_target_property(QUILL_INCLUDE_DIRS quill INTERFACE_INCLUDE_DIRECTORIES)
+    set_target_properties(quill PROPERTIES
+        INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${QUILL_INCLUDE_DIRS}"
+    )
+endif()
 
 # TODO : control
 enable_testing()
